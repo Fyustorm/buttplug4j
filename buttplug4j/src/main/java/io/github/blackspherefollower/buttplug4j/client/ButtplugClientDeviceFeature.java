@@ -137,11 +137,11 @@ public class ButtplugClientDeviceFeature {
 
     public Future<ButtplugMessage> PositionWithDuration(final int position, final int duration) throws ButtplugDeviceFeatureException {
         CheckStepRange("PositionWithDuration", position);
-        return device.sendOutputCommand(featureIndex, new OutputCmd.PositionWithDuration(position, duration));
+        return device.sendOutputCommand(featureIndex, new OutputCmd.HwPositionWithDuration(position, duration));
     }
 
     public Future<ButtplugMessage> PositionWithDurationFloat(final float position, final int duration) throws ButtplugDeviceFeatureException {
-        return device.sendOutputCommand(featureIndex, new OutputCmd.PositionWithDuration(GetStepFromFloat("PositionWithDuration", position), duration));
+        return device.sendOutputCommand(featureIndex, new OutputCmd.HwPositionWithDuration(GetStepFromFloat("PositionWithDuration", position), duration));
     }
 
     public boolean HasLed() {

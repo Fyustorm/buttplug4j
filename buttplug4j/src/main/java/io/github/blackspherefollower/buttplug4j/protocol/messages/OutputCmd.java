@@ -48,7 +48,7 @@ public class OutputCmd extends ButtplugDeviceMessage {
             @JsonSubTypes.Type(value = Position.class, name = "Position"),
             @JsonSubTypes.Type(value = Temperature.class, name = "Temperature"),
             @JsonSubTypes.Type(value = Constrict.class, name = "Constrict"),
-            @JsonSubTypes.Type(value = PositionWithDuration.class, name = "PositionWithDuration"),
+            @JsonSubTypes.Type(value = HwPositionWithDuration.class, name = "HwPositionWithDuration"),
             @JsonSubTypes.Type(value = Led.class, name = "Led")
     })
     public interface IOutputCommand {
@@ -154,16 +154,16 @@ public class OutputCmd extends ButtplugDeviceMessage {
         }
     }
 
-    public static class PositionWithDuration extends ValueCommand {
+    public static class HwPositionWithDuration extends ValueCommand {
         @JsonProperty(value = "Duration", required = true)
         private int duration;
 
-        public PositionWithDuration(int value, int duration) {
+        public HwPositionWithDuration(int value, int duration) {
             super(value);
             this.duration = duration;
         }
 
-        public PositionWithDuration() {
+        public HwPositionWithDuration() {
             super();
             this.duration = 0;
         }

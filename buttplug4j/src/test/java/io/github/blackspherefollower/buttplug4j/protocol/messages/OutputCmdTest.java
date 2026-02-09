@@ -258,7 +258,7 @@ class OutputCmdTest {
 
     @Test
     public void testPositionWithDuration() throws IOException, ButtplugProtocolException {
-        String testStr = "[{\"OutputCmd\":{\"Id\":1,\"DeviceIndex\":0,\"FeatureIndex\":0,\"Command\":{\"PositionWithDuration\":{\"Value\":5,\"Duration\":10}}}}]";
+        String testStr = "[{\"OutputCmd\":{\"Id\":1,\"DeviceIndex\":0,\"FeatureIndex\":0,\"Command\":{\"HwPositionWithDuration\":{\"Value\":5,\"Duration\":10}}}}]";
 
         Validator.Result result = new ValidatorFactory().validate(schema, testStr);
         assertTrue(result.isValid(), result.getErrors().stream().map(Error::getError).collect(Collectors.joining("\n")));
@@ -271,9 +271,9 @@ class OutputCmdTest {
         assertEquals(1, msgs.get(0).getId());
         assertEquals(0, ((OutputCmd) msgs.get(0)).getDeviceIndex());
         assertEquals(0, ((OutputCmd) msgs.get(0)).getFeatureIndex());
-        assertInstanceOf(OutputCmd.PositionWithDuration.class, ((OutputCmd) msgs.get(0)).getCommand());
-        assertEquals(5, ((OutputCmd.PositionWithDuration) ((OutputCmd) msgs.get(0)).getCommand()).getValue());
-        assertEquals(10, ((OutputCmd.PositionWithDuration) ((OutputCmd) msgs.get(0)).getCommand()).getDuration());
+        assertInstanceOf(OutputCmd.HwPositionWithDuration.class, ((OutputCmd) msgs.get(0)).getCommand());
+        assertEquals(5, ((OutputCmd.HwPositionWithDuration) ((OutputCmd) msgs.get(0)).getCommand()).getValue());
+        assertEquals(10, ((OutputCmd.HwPositionWithDuration) ((OutputCmd) msgs.get(0)).getCommand()).getDuration());
 
         String jsonOut = parser.formatJson(msgs);
         assertEquals(testStr, jsonOut);

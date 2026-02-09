@@ -238,9 +238,9 @@ class ButtplugClientDeviceFeatureTest {
         assertNotNull(result);
         ArgumentCaptor<OutputCmd.IOutputCommand> captor = ArgumentCaptor.forClass(OutputCmd.IOutputCommand.class);
         verify(mockDevice).sendOutputCommand(eq(0), captor.capture());
-        assertInstanceOf(OutputCmd.PositionWithDuration.class, captor.getValue());
-        assertEquals(15, ((OutputCmd.PositionWithDuration) captor.getValue()).getValue());
-        assertEquals(500, ((OutputCmd.PositionWithDuration) captor.getValue()).getDuration());
+        assertInstanceOf(OutputCmd.HwPositionWithDuration.class, captor.getValue());
+        assertEquals(15, ((OutputCmd.HwPositionWithDuration) captor.getValue()).getValue());
+        assertEquals(500, ((OutputCmd.HwPositionWithDuration) captor.getValue()).getDuration());
     }
 
     @Test
@@ -257,9 +257,9 @@ class ButtplugClientDeviceFeatureTest {
         assertNotNull(result);
         ArgumentCaptor<OutputCmd.IOutputCommand> captor = ArgumentCaptor.forClass(OutputCmd.IOutputCommand.class);
         verify(mockDevice).sendOutputCommand(eq(0), captor.capture());
-        assertInstanceOf(OutputCmd.PositionWithDuration.class, captor.getValue());
-        assertEquals(20, ((OutputCmd.PositionWithDuration) captor.getValue()).getValue());
-        assertEquals(500, ((OutputCmd.PositionWithDuration) captor.getValue()).getDuration());
+        assertInstanceOf(OutputCmd.HwPositionWithDuration.class, captor.getValue());
+        assertEquals(20, ((OutputCmd.HwPositionWithDuration) captor.getValue()).getValue());
+        assertEquals(500, ((OutputCmd.HwPositionWithDuration) captor.getValue()).getDuration());
     }
 
     @Test
