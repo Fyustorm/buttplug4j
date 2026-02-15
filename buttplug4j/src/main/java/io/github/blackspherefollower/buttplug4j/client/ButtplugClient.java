@@ -30,13 +30,13 @@ public abstract class ButtplugClient {
     private final Object sendLock = new Object();
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private Timer pingTimer;
-    private IDeviceAddedEvent deviceAdded;
-    private IDeviceChangedEvent deviceChanged;
-    private IDeviceRemovedEvent deviceRemoved;
-    private IScanningEvent scanningFinished;
-    private IErrorEvent errorReceived;
-    private ISensorReadingEvent sensorReadingReceived;
-    private IConnectedEvent onConnected;
+    private IDeviceAddedEvent deviceAddedHandler;
+    private IDeviceChangedEvent deviceChangedHandler;
+    private IDeviceRemovedEvent deviceRemovedHandler;
+    private IScanningEvent scanningFinishedHandler;
+    private IErrorEvent errorHandler;
+    private IInputEvent inputHandler;
+    private IConnectedEvent onConnectedHandler;
 
     public ButtplugClient(final String aClientName) {
         parser = new ButtplugJsonMessageParser();
@@ -84,14 +84,14 @@ public abstract class ButtplugClient {
 
                     if (compare > 0) {
                         devices.put(newDevs.get(newIdx), new ButtplugClientDevice(this, newDevices.get(newDevs.get(newIdx))));
-                        if (getDeviceAdded() != null) {
-                            getDeviceAdded().deviceAdded(devices.get(newDevs.get(newIdx)));
+                        if (getDeviceAddedHandler() != null) {
+                            getDeviceAddedHandler().deviceAdded(devices.get(newDevs.get(newIdx)));
                         }
                         newIdx++;
                     } else if (compare < 0) {
                         devices.remove(curDevs.get(curIdx));
-                        if (getDeviceRemoved() != null) {
-                            getDeviceRemoved().deviceRemoved(curDevs.get(curIdx));
+                        if (getDeviceRemovedHandler() != null) {
+                            getDeviceRemovedHandler().deviceRemoved(curDevs.get(curIdx));
                         }
                         curIdx++;
                     } else {
@@ -110,15 +110,15 @@ public abstract class ButtplugClient {
 
                 while (curIdx < curDevs.size()) {
                     devices.remove(curDevs.get(curIdx));
-                    if (getDeviceRemoved() != null) {
-                        getDeviceRemoved().deviceRemoved(curDevs.get(curIdx));
+                    if (getDeviceRemovedHandler() != null) {
+                        getDeviceRemovedHandler().deviceRemoved(curDevs.get(curIdx));
                     }
                     curIdx++;
                 }
                 while (newIdx < newDevs.size()) {
                     devices.put(newDevs.get(newIdx), new ButtplugClientDevice(this, newDevices.get(newDevs.get(newIdx))));
-                    if (getDeviceAdded() != null) {
-                        getDeviceAdded().deviceAdded(devices.get(newDevs.get(newIdx)));
+                    if (getDeviceAddedHandler() != null) {
+                        getDeviceAddedHandler().deviceAdded(devices.get(newDevs.get(newIdx)));
                     }
                     newIdx++;
                 }
@@ -133,16 +133,16 @@ public abstract class ButtplugClient {
             }
 
             if (msg instanceof ScanningFinished) {
-                if (getScanningFinished() != null) {
-                    getScanningFinished().scanningFinished();
+                if (getScanningFinishedHandler() != null) {
+                    getScanningFinishedHandler().scanningFinished();
                 }
             } else if (msg instanceof Error) {
-                if (getErrorReceived() != null) {
-                    getErrorReceived().errorReceived((Error) msg);
+                if (getErrorHandler() != null) {
+                    getErrorHandler().errorReceived((Error) msg);
                 }
             } else if (msg instanceof InputReading) {
-                if (getSensorReadingReceived() != null) {
-                    getSensorReadingReceived().sensorReadingReceived((InputReading) msg);
+                if (getInputHandler() != null) {
+                    getInputHandler().inputEvent((InputReading) msg);
                 }
             }
         }
@@ -164,8 +164,8 @@ public abstract class ButtplugClient {
                             try {
                                 onPingTimer();
                             } catch (Exception e) {
-                                if (errorReceived != null) {
-                                    errorReceived.errorReceived(new Error(e));
+                                if ( getErrorHandler() != null) {
+                                    getErrorHandler().errorReceived(new Error(new ButtplugClientException(e)));
                                 } else {
                                     e.printStackTrace();
                                 }
@@ -183,8 +183,8 @@ public abstract class ButtplugClient {
                 throw new ButtplugClientException("Unexpected message returned: " + res.getClass().getName());
             }
         } catch (ButtplugClientException | InterruptedException | ExecutionException | TimeoutException e) {
-            if (getErrorReceived() != null) {
-                getErrorReceived().errorReceived(new Error(e));
+            if (getErrorHandler() != null) {
+                getErrorHandler().errorReceived(new Error(new ButtplugClientException(e)));
             } else {
                 e.printStackTrace();
             }
@@ -192,8 +192,8 @@ public abstract class ButtplugClient {
 
         connectionState = ConnectionState.CONNECTED;
 
-        if (getOnConnected() != null) {
-            getOnConnected().onConnected(this);
+        if (getOnConnectedHandler() != null) {
+            getOnConnectedHandler().onConnected(this);
         }
 
     }
@@ -273,60 +273,60 @@ public abstract class ButtplugClient {
 
     protected abstract CompletableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg);
 
-    public final IDeviceAddedEvent getDeviceAdded() {
-        return deviceAdded;
+    public final IDeviceAddedEvent getDeviceAddedHandler() {
+        return deviceAddedHandler;
     }
 
-    public final void setDeviceAdded(final IDeviceAddedEvent deviceAddedHandler) {
-        this.deviceAdded = deviceAddedHandler;
+    public final void setDeviceAddedHandler(final IDeviceAddedEvent deviceAddedHandler) {
+        this.deviceAddedHandler = deviceAddedHandler;
     }
 
     public final IDeviceChangedEvent getDeviceChanged() {
-        return deviceChanged;
+        return deviceChangedHandler;
     }
 
-    public final void setDeviceChanged(final IDeviceChangedEvent deviceChangedHandler) {
-        this.deviceChanged = deviceChangedHandler;
+    public final void setDeviceChangedHandler(final IDeviceChangedEvent deviceChangedHandler) {
+        this.deviceChangedHandler = deviceChangedHandler;
     }
 
-    public final IDeviceRemovedEvent getDeviceRemoved() {
-        return deviceRemoved;
+    public final IDeviceRemovedEvent getDeviceRemovedHandler() {
+        return deviceRemovedHandler;
     }
 
-    public final void setDeviceRemoved(final IDeviceRemovedEvent deviceRemovedHandler) {
-        this.deviceRemoved = deviceRemovedHandler;
+    public final void setDeviceRemovedHandler(final IDeviceRemovedEvent deviceRemovedHandler) {
+        this.deviceRemovedHandler = deviceRemovedHandler;
     }
 
-    public final IScanningEvent getScanningFinished() {
-        return scanningFinished;
+    public final IScanningEvent getScanningFinishedHandler() {
+        return scanningFinishedHandler;
     }
 
-    public final void setScanningFinished(final IScanningEvent scanningFinishedHandler) {
-        this.scanningFinished = scanningFinishedHandler;
+    public final void setScanningFinishedHandler(final IScanningEvent scanningFinishedHandler) {
+        this.scanningFinishedHandler = scanningFinishedHandler;
     }
 
-    public final IErrorEvent getErrorReceived() {
-        return errorReceived;
+    public final IErrorEvent getErrorHandler() {
+        return errorHandler;
     }
 
-    public final void setErrorReceived(final IErrorEvent errorReceivedHandler) {
-        this.errorReceived = errorReceivedHandler;
+    public final void setErrorHandler(final IErrorEvent errorReceivedHandler) {
+        this.errorHandler = errorReceivedHandler;
     }
 
-    public final ISensorReadingEvent getSensorReadingReceived() {
-        return sensorReadingReceived;
+    public final IInputEvent getInputHandler() {
+        return inputHandler;
     }
 
-    public final void setSensorReadingReceived(final ISensorReadingEvent sensorReadingReceivedHandler) {
-        this.sensorReadingReceived = sensorReadingReceivedHandler;
+    public final void setInputHandler(final IInputEvent inputHandler) {
+        this.inputHandler = inputHandler;
     }
 
-    public final IConnectedEvent getOnConnected() {
-        return onConnected;
+    public final IConnectedEvent getOnConnectedHandler() {
+        return onConnectedHandler;
     }
 
     public final void setOnConnected(final IConnectedEvent onConnected) {
-        this.onConnected = onConnected;
+        this.onConnectedHandler = onConnected;
     }
 
     protected abstract void cleanup();

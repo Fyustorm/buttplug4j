@@ -16,6 +16,7 @@ import io.github.blackspherefollower.buttplug4j.protocol.messages.Error;
         @JsonSubTypes.Type(value = Ping.class, name = "Ping"),
         @JsonSubTypes.Type(value = RequestDeviceList.class, name = "RequestDeviceList"),
         @JsonSubTypes.Type(value = RequestServerInfo.class, name = "RequestServerInfo"),
+        @JsonSubTypes.Type(value = Disconnect.class, name = "Disconnect"),
         @JsonSubTypes.Type(value = OutputCmd.class, name = "OutputCmd"),
         @JsonSubTypes.Type(value = InputCmd.class, name = "InputCmd"),
         @JsonSubTypes.Type(value = ScanningFinished.class, name = "ScanningFinished"),

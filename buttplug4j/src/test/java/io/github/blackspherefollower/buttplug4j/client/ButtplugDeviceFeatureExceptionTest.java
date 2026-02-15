@@ -10,14 +10,14 @@ public class ButtplugDeviceFeatureExceptionTest {
 
     @Test
     public void testExceptionWithMessage() {
-        ButtplugDeviceFeatureException exception = new ButtplugDeviceFeatureException("slap");
+        ButtplugDeviceFeatureException exception = new ButtplugDeviceFeatureException(ButtplugOutput.VIBRATE);
 
-        assertEquals("Buttplug Device Feature does not support slap", exception.getMessage());
+        assertEquals("Buttplug Device Feature does not support Vibrate", exception.getMessage());
     }
 
     @Test
     public void testExceptionInheritance() {
-        ButtplugDeviceFeatureException exception = new ButtplugDeviceFeatureException("test");
+        ButtplugDeviceFeatureException exception = new ButtplugDeviceFeatureException(ButtplugOutput.ROTATE);
         assertInstanceOf(ButtplugException.class, exception);
     }
 }

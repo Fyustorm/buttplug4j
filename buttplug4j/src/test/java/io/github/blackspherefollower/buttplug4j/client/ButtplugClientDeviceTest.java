@@ -109,10 +109,10 @@ class ButtplugClientDeviceTest {
     }
 
     @Test
-    void testSendOutputCommand() {
+    void testRunOutput() {
         OutputCmd.Vibrate vibrateCommand = new OutputCmd.Vibrate(50);
 
-        Future<ButtplugMessage> result = clientDevice.sendOutputCommand(0, vibrateCommand);
+        Future<ButtplugMessage> result = clientDevice.runOutput(0, vibrateCommand);
 
         assertNotNull(result);
         verify(mockClient).getNextMsgId();
@@ -120,10 +120,10 @@ class ButtplugClientDeviceTest {
     }
 
     @Test
-    void testSendOutputCommandWithDifferentFeatureIndex() {
+    void testRunOutputWithDifferentFeatureIndex() {
         OutputCmd.Vibrate vibrateCommand = new OutputCmd.Vibrate(75);
 
-        Future<ButtplugMessage> result = clientDevice.sendOutputCommand(1, vibrateCommand);
+        Future<ButtplugMessage> result = clientDevice.runOutput(1, vibrateCommand);
 
         assertNotNull(result);
         verify(mockClient).getNextMsgId();

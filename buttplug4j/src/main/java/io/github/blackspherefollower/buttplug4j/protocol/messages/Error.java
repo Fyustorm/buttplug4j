@@ -3,6 +3,9 @@ package io.github.blackspherefollower.buttplug4j.protocol.messages;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.blackspherefollower.buttplug4j.ButtplugException;
+import io.github.blackspherefollower.buttplug4j.client.ButtplugClientException;
+import io.github.blackspherefollower.buttplug4j.client.ButtplugDeviceException;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugConsts;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 
@@ -14,7 +17,7 @@ public final class Error extends ButtplugMessage {
     @JsonProperty(value = "ErrorMessage", required = true)
     private String errorMessage;
     @JsonIgnore
-    private Throwable exception = null;
+    private ButtplugException exception = null;
 
     public Error(final String errorMessage, final ErrorClass errorCode, final int id) {
         super(id);
@@ -29,14 +32,14 @@ public final class Error extends ButtplugMessage {
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
     }
 
-    public Error(Throwable e) {
+    public Error(ButtplugException e) {
         super(ButtplugConsts.SYSTEM_MSG_ID);
         this.setErrorMessage(e.getMessage());
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
         this.exception = e;
     }
 
-    public Error(Throwable e, final int id) {
+    public Error(ButtplugException e, final int id) {
         super(id);
         this.setErrorMessage(e.getMessage());
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
@@ -59,8 +62,15 @@ public final class Error extends ButtplugMessage {
         this.errorMessage = errorMessage;
     }
 
-    public Throwable getException() {
-        return exception;
+    public ButtplugException getException() {
+        if(exception != null) {
+            return exception;
+        } else if ( errorCode == ErrorClass.ERROR_DEVICE ) {
+            return new ButtplugDeviceException( errorMessage );
+        } else if( errorCode != null ){
+            return new ButtplugClientException( errorMessage );
+        }
+        return null;
     }
 
     public enum ErrorClass {

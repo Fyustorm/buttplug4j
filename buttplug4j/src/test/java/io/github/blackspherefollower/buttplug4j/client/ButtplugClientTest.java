@@ -75,43 +75,43 @@ class ButtplugClientTest {
     @Test
     void testSetAndGetDeviceAddedHandler() {
         IDeviceAddedEvent handler = device -> addedDevice.set(device);
-        client.setDeviceAdded(handler);
-        assertEquals(handler, client.getDeviceAdded());
+        client.setDeviceAddedHandler(handler);
+        assertEquals(handler, client.getDeviceAddedHandler());
     }
 
     @Test
     void testSetAndGetDeviceRemovedHandler() {
         IDeviceRemovedEvent handler = device -> removedDevice.set(device);
-        client.setDeviceRemoved(handler);
-        assertEquals(handler, client.getDeviceRemoved());
+        client.setDeviceRemovedHandler(handler);
+        assertEquals(handler, client.getDeviceRemovedHandler());
     }
 
     @Test
     void testSetAndGetScanningFinishedHandler() {
         IScanningEvent handler = () -> scanningFinishedCalled.set(true);
-        client.setScanningFinished(handler);
-        assertEquals(handler, client.getScanningFinished());
+        client.setScanningFinishedHandler(handler);
+        assertEquals(handler, client.getScanningFinishedHandler());
     }
 
     @Test
     void testSetAndGetErrorReceivedHandler() {
         IErrorEvent handler = error -> errorReceived.set(error);
-        client.setErrorReceived(handler);
-        assertEquals(handler, client.getErrorReceived());
+        client.setErrorHandler(handler);
+        assertEquals(handler, client.getErrorHandler());
     }
 
     @Test
     void testSetAndGetSensorReadingReceivedHandler() {
-        ISensorReadingEvent handler = reading -> sensorReadingReceived.set(reading);
-        client.setSensorReadingReceived(handler);
-        assertEquals(handler, client.getSensorReadingReceived());
+        IInputEvent handler = reading -> sensorReadingReceived.set(reading);
+        client.setInputHandler(handler);
+        assertEquals(handler, client.getInputHandler());
     }
 
     @Test
     void testSetAndGetOnConnectedHandler() {
         IConnectedEvent handler = c -> connectedCalled.set(true);
         client.setOnConnected(handler);
-        assertEquals(handler, client.getOnConnected());
+        assertEquals(handler, client.getOnConnectedHandler());
     }
 
     @Test
@@ -136,7 +136,7 @@ class ButtplugClientTest {
 
     @Test
     void testOnMessageWithError() {
-        client.setErrorReceived(error -> errorReceived.set(error));
+        client.setErrorHandler(error -> errorReceived.set(error));
 
         List<ButtplugMessage> messages = new ArrayList<>();
         Error error = new Error("Test error", Error.ErrorClass.ERROR_DEVICE, 0);
@@ -149,7 +149,7 @@ class ButtplugClientTest {
 
     @Test
     void testOnMessageWithScanningFinished() {
-        client.setScanningFinished(() -> scanningFinishedCalled.set(true));
+        client.setScanningFinishedHandler(() -> scanningFinishedCalled.set(true));
 
         List<ButtplugMessage> messages = new ArrayList<>();
         messages.add(new ScanningFinished());
@@ -160,7 +160,7 @@ class ButtplugClientTest {
 
     @Test
     void testOnMessageWithInputReading() {
-        client.setSensorReadingReceived(reading -> sensorReadingReceived.set(reading));
+        client.setInputHandler(reading -> sensorReadingReceived.set(reading));
 
         List<ButtplugMessage> messages = new ArrayList<>();
         InputReading reading = new InputReading(0, 1, 1);
@@ -240,9 +240,9 @@ class ButtplugClientTest {
         DeviceList deviceList = new DeviceList(devices, 1);
         client.setNextResponse(deviceList);
 
-        client.setDeviceAdded(dev -> addedDevice.set(dev));
-        client.setDeviceRemoved(dev -> removedDevice.set(dev));
-        client.setDeviceChanged(dev -> updatedDevice.set(dev));
+        client.setDeviceAddedHandler(dev -> addedDevice.set(dev));
+        client.setDeviceRemovedHandler(dev -> removedDevice.set(dev));
+        client.setDeviceChangedHandler(dev -> updatedDevice.set(dev));
         client.requestDeviceList();
         ButtplugMessage msg = client.sentMessages.remove(0);
         assertInstanceOf(RequestDeviceList.class, msg);
@@ -384,7 +384,7 @@ class ButtplugClientTest {
     @Test
     void testDoHandshakeWithError() {
         client.setNextResponse(new Error("Handshake failed", Error.ErrorClass.ERROR_UNKNOWN, 1));
-        client.setErrorReceived(error -> errorReceived.set(error));
+        client.setErrorHandler(error -> errorReceived.set(error));
 
         client.doHandshake();
 
@@ -404,7 +404,7 @@ class ButtplugClientTest {
         client.setNextResponse(deviceList);
 
         AtomicInteger deviceCount = new AtomicInteger(0);
-        client.setDeviceAdded(dev -> deviceCount.incrementAndGet());
+        client.setDeviceAddedHandler(dev -> deviceCount.incrementAndGet());
         client.requestDeviceList();
 
         assertEquals(2, deviceCount.get());
@@ -512,8 +512,8 @@ class ButtplugClientTest {
 
     @Test
     void testOnMessageWithMultipleMessages() {
-        client.setScanningFinished(() -> scanningFinishedCalled.set(true));
-        client.setErrorReceived(error -> errorReceived.set(error));
+        client.setScanningFinishedHandler(() -> scanningFinishedCalled.set(true));
+        client.setErrorHandler(error -> errorReceived.set(error));
 
         List<ButtplugMessage> messages = new ArrayList<>();
         messages.add(new ScanningFinished());
@@ -537,7 +537,7 @@ class ButtplugClientTest {
 
     @Test
     void testOnMessageBranches() {
-        client.setScanningFinished(() -> scanningFinishedCalled.set(true));
+        client.setScanningFinishedHandler(() -> scanningFinishedCalled.set(true));
         
         // Test Ping branch (should be ignored by client for now, but covered)
         client.onMessage(Arrays.asList(new Ping(0)));
@@ -557,31 +557,31 @@ class ButtplugClientTest {
     @Test
     void testEventsAccessors() {
         IDeviceAddedEvent added = device -> {};
-        client.setDeviceAdded(added);
-        assertEquals(added, client.getDeviceAdded());
+        client.setDeviceAddedHandler(added);
+        assertEquals(added, client.getDeviceAddedHandler());
 
         IDeviceChangedEvent changed = device -> {};
-        client.setDeviceChanged(changed);
+        client.setDeviceChangedHandler(changed);
         assertEquals(changed, client.getDeviceChanged());
 
         IDeviceRemovedEvent removed = device -> {};
-        client.setDeviceRemoved(removed);
-        assertEquals(removed, client.getDeviceRemoved());
+        client.setDeviceRemovedHandler(removed);
+        assertEquals(removed, client.getDeviceRemovedHandler());
 
         IScanningEvent scanning = () -> {};
-        client.setScanningFinished(scanning);
-        assertEquals(scanning, client.getScanningFinished());
+        client.setScanningFinishedHandler(scanning);
+        assertEquals(scanning, client.getScanningFinishedHandler());
 
         IErrorEvent error = e -> {};
-        client.setErrorReceived(error);
-        assertEquals(error, client.getErrorReceived());
+        client.setErrorHandler(error);
+        assertEquals(error, client.getErrorHandler());
 
-        ISensorReadingEvent sensor = reading -> {};
-        client.setSensorReadingReceived(sensor);
-        assertEquals(sensor, client.getSensorReadingReceived());
+        IInputEvent sensor = reading -> {};
+        client.setInputHandler(sensor);
+        assertEquals(sensor, client.getInputHandler());
 
         IConnectedEvent connected = c -> {};
         client.setOnConnected(connected);
-        assertEquals(connected, client.getOnConnected());
+        assertEquals(connected, client.getOnConnectedHandler());
     }
 }

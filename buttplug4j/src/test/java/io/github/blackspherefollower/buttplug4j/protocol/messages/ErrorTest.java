@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,7 +63,7 @@ public class ErrorTest {
 
     @Test
     public void testExceptionConstructors() {
-        Throwable ex = new RuntimeException("Test message");
+        io.github.blackspherefollower.buttplug4j.ButtplugException ex = new io.github.blackspherefollower.buttplug4j.client.ButtplugClientException("Test message");
         Error err1 = new Error(ex);
         assertEquals("Test message", err1.getErrorMessage());
         assertEquals(Error.ErrorClass.ERROR_UNKNOWN, err1.getErrorCode());
@@ -85,6 +86,8 @@ public class ErrorTest {
         assertEquals("new msg", err.getErrorMessage());
         assertEquals(Error.ErrorClass.ERROR_PING, err.getErrorCode());
         assertEquals(456, err.getId());
-        assertNull(err.getException());
+        // Since getException() now creates a new exception based on errorCode if exception field is null,
+        // it won't be null here.
+        assertNotNull(err.getException());
     }
 }

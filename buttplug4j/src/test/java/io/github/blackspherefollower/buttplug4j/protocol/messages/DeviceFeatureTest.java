@@ -88,17 +88,17 @@ public class DeviceFeatureTest {
     public void testPositionWithDuration() {
         int[] steps = {10};
         int[] duration = {100};
-        DeviceFeature.PositionWithDuration pwd = new DeviceFeature.PositionWithDuration(steps, duration);
+        DeviceFeature.HwPositionWithDuration pwd = new DeviceFeature.HwPositionWithDuration(steps, duration);
         assertArrayEquals(steps, pwd.getValue());
         assertArrayEquals(duration, pwd.getDuration());
         
-        DeviceFeature.PositionWithDuration pwd2 = new DeviceFeature.PositionWithDuration();
+        DeviceFeature.HwPositionWithDuration pwd2 = new DeviceFeature.HwPositionWithDuration();
         pwd2.setStepCount(steps);
         pwd2.setDuration(duration);
         assertEquals(pwd, pwd2);
         
-        assertNotEquals(pwd, new DeviceFeature.PositionWithDuration(new int[]{20}, duration));
-        assertNotEquals(pwd, new DeviceFeature.PositionWithDuration(steps, new int[]{200}));
+        assertNotEquals(pwd, new DeviceFeature.HwPositionWithDuration(new int[]{20}, duration));
+        assertNotEquals(pwd, new DeviceFeature.HwPositionWithDuration(steps, new int[]{200}));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class DeviceFeatureTest {
     @Test
     public void testOutputDescriptorSerialization() throws IOException, ButtplugProtocolException {
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        String json = "[{\"DeviceList\":{\"Id\":1,\"Devices\":{\"0\":{\"DeviceIndex\":0,\"DeviceName\":\"Test\",\"DeviceFeatures\":{\"0\":{\"FeatureIndex\":0,\"FeatureDescription\":\"Test\",\"Output\":{\"Vibrate\":{\"Value\":[0,20]},\"Rotate\":{\"Value\":[0,20]},\"Oscillate\":{\"Value\":[0,20]},\"Constrict\":{\"Value\":[0,20]},\"Spray\":{\"Value\":[0,20]},\"Temperature\":{\"Value\":[0,20]},\"Led\":{\"Value\":[0,20]},\"Position\":{\"Value\":[0,20]},\"PositionWithDuration\":{\"Value\":[0,100],\"Duration\":[0,2000]}}}}}}}}]";
+        String json = "[{\"DeviceList\":{\"Id\":1,\"Devices\":{\"0\":{\"DeviceIndex\":0,\"DeviceName\":\"Test\",\"DeviceFeatures\":{\"0\":{\"FeatureIndex\":0,\"FeatureDescription\":\"Test\",\"Output\":{\"Vibrate\":{\"Value\":[0,20]},\"Rotate\":{\"Value\":[0,20]},\"Oscillate\":{\"Value\":[0,20]},\"Constrict\":{\"Value\":[0,20]},\"Spray\":{\"Value\":[0,20]},\"Temperature\":{\"Value\":[0,20]},\"Led\":{\"Value\":[0,20]},\"Position\":{\"Value\":[0,20]},\"HwPositionWithDuration\":{\"Value\":[0,100],\"Duration\":[0,2000]}}}}}}}}]";
         
         List<ButtplugMessage> msgs = parser.parseJson(json);
         assertEquals(1, msgs.size());

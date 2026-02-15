@@ -1,12 +1,15 @@
 package io.github.blackspherefollower.buttplug4j.client;
 
+import io.github.blackspherefollower.buttplug4j.ButtplugException;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 import io.github.blackspherefollower.buttplug4j.protocol.messages.*;
+import io.github.blackspherefollower.buttplug4j.protocol.messages.Error;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class ButtplugClientDevice {
@@ -69,15 +72,53 @@ public class ButtplugClientDevice {
         return deviceFeatures;
     }
 
-    public Future<ButtplugMessage> sendOutputCommand(int featureIndex, OutputCmd.IOutputCommand outputCommand) {
+    public final boolean hasOutput(ButtplugOutput outputType) {
+        return deviceFeatures.values().stream().anyMatch(f -> f.hasOutput(outputType));
+    }
+
+    public Future<ButtplugMessage> runOutput(int featureIndex, OutputCmd.IOutputCommand outputCommand) {
         OutputCmd cmd = new OutputCmd(client.getNextMsgId(), deviceIndex, featureIndex);
         cmd.setCommand(outputCommand);
         return client.sendMessage(cmd);
     }
 
-    public Future<ButtplugMessage> sendInputCommand(int featureIndex, final String inputType, final InputCommandType inputCommand) {
-        InputCmd cmd = new InputCmd(client.getNextMsgId(), deviceIndex, featureIndex, inputType, inputCommand);
+    public final boolean hasInput(ButtplugInput inputType) {
+        return deviceFeatures.values().stream().anyMatch(f -> f.hasInput(inputType));
+    }
+
+    public Future<ButtplugMessage> runInput(int featureIndex, final ButtplugInput inputType, final InputCommandType inputCommand) {
+        InputCmd cmd = new InputCmd(client.getNextMsgId(), deviceIndex, featureIndex, inputType.getName(), inputCommand);
         return client.sendMessage(cmd);
+    }
+
+    public Future<ButtplugMessage> runInputRead(int featureIndex, final ButtplugInput inputType) {
+        return runInput(featureIndex, inputType, InputCommandType.READ);
+    }
+
+    public Future<ButtplugMessage> runInputSubscribe(int featureIndex, final ButtplugInput inputType) {
+        return runInput(featureIndex, inputType, InputCommandType.SUBSCRIBE);
+    }
+
+    public Future<ButtplugMessage> runInputUnsubscribe(int featureIndex, final ButtplugInput inputType) {
+        return runInput(featureIndex, inputType, InputCommandType.UNSUBSCRIBE);
+    }
+
+    public int readBattery() throws ExecutionException, InterruptedException, TimeoutException, ButtplugException {
+        java.util.Optional<ButtplugClientDeviceFeature> feature = deviceFeatures.values().stream().filter(f -> f.getInput().containsKey("Battery")).findFirst();
+        if( feature.isPresent() ) {
+            return feature.get().readBattery();
+        } else {
+            throw new ButtplugDeviceException("Battery feature not found");
+        }
+    }
+
+    public int readRSSI() throws ExecutionException, InterruptedException, TimeoutException, ButtplugException {
+        java.util.Optional<ButtplugClientDeviceFeature> feature = deviceFeatures.values().stream().filter(f -> f.getInput().containsKey("Battery")).findFirst();
+        if( feature.isPresent() ) {
+            return feature.get().readRSSI();
+        } else {
+            throw new ButtplugDeviceException("RSSI feature not found");
+        }
     }
 
     @Override
@@ -89,15 +130,8 @@ public class ButtplugClientDevice {
             return false;
         }
         ButtplugClientDevice that = (ButtplugClientDevice) o;
-        if (deviceIndex != that.deviceIndex ||
-                !deviceName.equals(that.deviceName) ||
-                !deviceDisplayName.equals(that.deviceDisplayName) ||
-                !Objects.equals(deviceMessageTimingGap, that.deviceMessageTimingGap) ||
-                (deviceFeatures == null) != (that.deviceFeatures == null)) {
+        if (deviceIndex != that.deviceIndex || !deviceName.equals(that.deviceName) || !deviceDisplayName.equals(that.deviceDisplayName) || !Objects.equals(deviceMessageTimingGap, that.deviceMessageTimingGap)) {
             return false;
-        }
-        if (deviceFeatures == null) {
-            return true;
         }
         if (deviceFeatures.size() != that.deviceFeatures.size() ||
                 !deviceFeatures.keySet().containsAll(that.deviceFeatures.keySet())) {
@@ -109,5 +143,95 @@ public class ButtplugClientDevice {
             }
         }
         return true;
+    }
+
+    public List<Future<ButtplugMessage>> runVibrateFloat(final float vibrate) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasVibrate() ) {
+                msgs.add(f.runVibrateFloat(vibrate));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runRotateFloat(final float rotate) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasRotate() ) {
+                msgs.add(f.runRotateFloat(rotate));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runSprayFloat(final float spray) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasSpray() ) {
+                msgs.add(f.runSprayFloat(spray));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runOscillateFloat(final float oscillate) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasOscillate() ) {
+                msgs.add(f.runOscillateFloat(oscillate));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runPositionFloat(final float position) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasPosition() ) {
+                msgs.add(f.runPositionFloat(position));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runLedFloat(final float led) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasLed() ) {
+                msgs.add(f.runLedFloat(led));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runTemperatureFloat(final float temperature) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasTemperature() ) {
+                msgs.add(f.runTemperatureFloat(temperature));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runConstrictFloat(final float constrict) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasConstrict() ) {
+                msgs.add(f.runConstrictFloat(constrict));
+            }
+        }
+        return msgs;
+    }
+
+    public List<Future<ButtplugMessage>> runHwPositionWithDurationFloat(final float position, final int duration) throws ButtplugDeviceFeatureException {
+        List<Future<ButtplugMessage>> msgs = new ArrayList<>();
+        for( ButtplugClientDeviceFeature f : deviceFeatures.values() ) {
+            if( f.hasHwPositionWithDuration() ) {
+                msgs.add(f.runHwPositionWithDurationFloat(position, duration));
+            }
+        }
+        return msgs;
     }
 }

@@ -76,7 +76,7 @@ public final class DeviceFeature {
             @JsonSubTypes.Type(value = DeviceFeature.Position.class, name = "Position"),
             @JsonSubTypes.Type(value = DeviceFeature.Temperature.class, name = "Temperature"),
             @JsonSubTypes.Type(value = DeviceFeature.Constrict.class, name = "Constrict"),
-            @JsonSubTypes.Type(value = DeviceFeature.PositionWithDuration.class, name = "PositionWithDuration"),
+            @JsonSubTypes.Type(value = DeviceFeature.HwPositionWithDuration.class, name = "HwPositionWithDuration"),
             @JsonSubTypes.Type(value = DeviceFeature.Led.class, name = "Led")
     })
     public interface OutputDescriptor {
@@ -191,16 +191,16 @@ public final class DeviceFeature {
         }
     }
 
-    public static class PositionWithDuration extends SteppedOutputDescriptor {
+    public static class HwPositionWithDuration extends SteppedOutputDescriptor {
         @JsonProperty(value = "Duration", required = true)
         private int[] duration;
 
-        public PositionWithDuration(int[] value, int[] duration) {
+        public HwPositionWithDuration(int[] value, int[] duration) {
             super(value);
             this.duration = duration;
         }
 
-        public PositionWithDuration() {
+        public HwPositionWithDuration() {
             super(new int[]{0, 0});
             this.duration = new int[]{0, 0};
         }
@@ -221,7 +221,7 @@ public final class DeviceFeature {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            PositionWithDuration that = (PositionWithDuration) o;
+            HwPositionWithDuration that = (HwPositionWithDuration) o;
             return java.util.Arrays.equals(getValue(), that.getValue()) && java.util.Arrays.equals(duration, that.duration);
         }
     }
