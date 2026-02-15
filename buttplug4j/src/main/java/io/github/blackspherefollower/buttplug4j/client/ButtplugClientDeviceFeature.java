@@ -130,9 +130,16 @@ public final class ButtplugClientDeviceFeature {
             throw new ButtplugDeviceFeatureException(type);
         }
         if (desc instanceof DeviceFeature.SteppedOutputDescriptor) {
-            int steps = ((DeviceFeature.SteppedOutputDescriptor) desc).getValue()[1];
-            if (value > steps || value < 0) {
-                throw new ButtplugDeviceFeatureException(value, steps);
+            if (value < 0) {
+                int steps = ((DeviceFeature.SteppedOutputDescriptor) desc).getValue()[0];
+                if (value < steps) {
+                    throw new ButtplugDeviceFeatureException(value, steps);
+                }
+            } else {
+                int steps = ((DeviceFeature.SteppedOutputDescriptor) desc).getValue()[1];
+                if (value > steps) {
+                    throw new ButtplugDeviceFeatureException(value, steps);
+                }
             }
         } else {
             throw new ButtplugDeviceFeatureException(type);
@@ -339,7 +346,26 @@ public final class ButtplugClientDeviceFeature {
     public Future<ButtplugMessage> runHwPositionWithDuration(final int position, final int duration)
             throws ButtplugDeviceFeatureException {
         checkStepRange(ButtplugOutput.HW_POSITION_WITH_DURATION, position);
+
+        // Validate duration
+        checkDuration(duration);
+
         return device.runOutput(featureIndex, new OutputCmd.HwPositionWithDuration(position, duration));
+    }
+
+    private void checkDuration(final int duration) throws ButtplugDeviceFeatureException {
+        DeviceFeature.OutputDescriptor desc = output.get(ButtplugOutput.HW_POSITION_WITH_DURATION);
+        if (desc == null) {
+            throw new ButtplugDeviceFeatureException(ButtplugOutput.HW_POSITION_WITH_DURATION);
+        }
+        if (desc instanceof DeviceFeature.HwPositionWithDuration) {
+            int steps = ((DeviceFeature.HwPositionWithDuration) desc).getDuration()[1];
+            if (duration > steps || duration < 0) {
+                throw new ButtplugDeviceFeatureException(duration, steps);
+            }
+        } else {
+            throw new ButtplugDeviceFeatureException(ButtplugOutput.HW_POSITION_WITH_DURATION);
+        }
     }
 
     /**
@@ -352,9 +378,13 @@ public final class ButtplugClientDeviceFeature {
      */
     public Future<ButtplugMessage> runHwPositionWithDurationFloat(final float position, final int duration)
             throws ButtplugDeviceFeatureException {
-        int steps = getStepFromFloat(ButtplugOutput.HW_POSITION_WITH_DURATION, position);
-        checkStepRange(ButtplugOutput.HW_POSITION_WITH_DURATION, steps);
-        return device.runOutput(featureIndex, new OutputCmd.HwPositionWithDuration(steps, duration));
+        int step = getStepFromFloat(ButtplugOutput.HW_POSITION_WITH_DURATION, position);
+        checkStepRange(ButtplugOutput.HW_POSITION_WITH_DURATION, step);
+        // Validate duration
+        checkDuration(duration);
+
+        checkStepRange(ButtplugOutput.HW_POSITION_WITH_DURATION, step);
+        return device.runOutput(featureIndex, new OutputCmd.HwPositionWithDuration(step, duration));
     }
 
     /**

@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -33,7 +34,7 @@ class ButtplugClientDeviceFeatureTest {
 
         ArrayList<DeviceFeature.OutputDescriptor> outputs = new ArrayList<>();
         outputs.add(new DeviceFeature.Vibrate(new int[]{0, 100}));
-        outputs.add(new DeviceFeature.Rotate(new int[]{0, 50}));
+        outputs.add(new DeviceFeature.Rotate(new int[]{-50, 50}));
         outputs.add(new DeviceFeature.Oscillate(new int[]{0, 20}));
         outputs.add(new DeviceFeature.Constrict(new int[]{0, 10}));
         outputs.add(new DeviceFeature.Spray(new int[]{0, 5}));
@@ -66,6 +67,88 @@ class ButtplugClientDeviceFeatureTest {
         assertInstanceOf(OutputCmd.Vibrate.class, captor.getValue());
         assertEquals(50, ((OutputCmd.Vibrate) captor.getValue()).getValue());
     }
+
+    @Test
+    void testNegativeVibrateSteps() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        try {
+            Future<ButtplugMessage> result = clientFeature.runVibrateFloat(-1.0f);
+            fail("Shouldn't get here");
+        } catch (ButtplugDeviceFeatureException e) {
+            assertEquals("Buttplug Device Feature value out of range", e.getMessage());
+        }
+    }
+
+    @Test
+    void testNegativeVibrateFloat() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        try {
+            Future<ButtplugMessage> result = clientFeature.runVibrateFloat(-1.0f);
+            fail("Shouldn't get here");
+        } catch (ButtplugDeviceFeatureException e) {
+            assertEquals("Buttplug Device Feature value out of range", e.getMessage());
+        }
+    }
+
+
+    @Test
+    void testNegativeRotateSteps() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        Future<ButtplugMessage> result = clientFeature.runRotate(-50);
+
+        assertNotNull(result);
+        ArgumentCaptor<OutputCmd.IOutputCommand> captor = ArgumentCaptor.forClass(OutputCmd.IOutputCommand.class);
+        verify(mockDevice).runOutput(eq(0), captor.capture());
+        assertInstanceOf(OutputCmd.Rotate.class, captor.getValue());
+        assertEquals(-50, ((OutputCmd.Rotate) captor.getValue()).getValue());
+    }
+
+    @Test
+    void testNegativeRotateFloat() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        Future<ButtplugMessage> result = clientFeature.runRotateFloat(-1.0f);
+
+        assertNotNull(result);
+        ArgumentCaptor<OutputCmd.IOutputCommand> captor = ArgumentCaptor.forClass(OutputCmd.IOutputCommand.class);
+        verify(mockDevice).runOutput(eq(0), captor.capture());
+        assertInstanceOf(OutputCmd.Rotate.class, captor.getValue());
+        assertEquals(-50, ((OutputCmd.Rotate) captor.getValue()).getValue());
+    }
+
+    @Test
+    void testNegativeRotateStepsOOR() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        try {
+            Future<ButtplugMessage> result = clientFeature.runVibrateFloat(-1.0f);
+            fail("Shouldn't get here");
+        } catch (ButtplugDeviceFeatureException e) {
+            assertEquals("Buttplug Device Feature value out of range", e.getMessage());
+        }
+    }
+
+    @Test
+    void testNegativeRotateFloatOOR() throws Exception {
+        CompletableFuture<ButtplugMessage> future = CompletableFuture.completedFuture(mock(ButtplugMessage.class));
+        when(mockDevice.runOutput(anyInt(), any(OutputCmd.IOutputCommand.class))).thenReturn(future);
+
+        try {
+            Future<ButtplugMessage> result = clientFeature.runVibrateFloat(-1.0f);
+            fail("Shouldn't get here");
+        } catch (ButtplugDeviceFeatureException e) {
+            assertEquals("Buttplug Device Feature value out of range", e.getMessage());
+        }
+    }
+
 
     @Test
     void testVibrateWithInvalidStepThrowsException() {
