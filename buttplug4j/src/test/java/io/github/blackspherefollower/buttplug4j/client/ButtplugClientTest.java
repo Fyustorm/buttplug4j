@@ -19,7 +19,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class ButtplugClientTest {
 
@@ -444,49 +451,6 @@ class ButtplugClientTest {
         assertFalse(client.waitForOk(errorFuture));
     }
 
-    /**
-     * Concrete implementation of ButtplugClient for testing purposes
-     */
-    private static class TestButtplugClient extends ButtplugClient {
-        private final List<ButtplugMessage> messageQueue = new ArrayList<>();
-        ButtplugMessage lastSentMessage;
-        List<ButtplugMessage> sentMessages = new ArrayList<>();
-        boolean cleanupCalled = false;
-        private int queueIndex = 0;
-
-        public TestButtplugClient(String clientName) {
-            super(clientName);
-        }
-
-        public void setNextResponse(ButtplugMessage message) {
-            messageQueue.add(message);
-        }
-
-        @Override
-        protected CompletableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) {
-            lastSentMessage = msg;
-            sentMessages.add(msg);
-
-            CompletableFuture<ButtplugMessage> future = new CompletableFuture<>();
-            scheduleWait(msg.getId(), future);
-
-            if (queueIndex < messageQueue.size()) {
-                ButtplugMessage response = messageQueue.get(queueIndex++);
-                response.setId(msg.getId());
-                onMessage(Collections.singletonList(response));
-            } else {
-                onMessage(Collections.singletonList(new Ok(msg.getId())));
-            }
-
-            return future;
-        }
-
-        @Override
-        protected void cleanup() {
-            cleanupCalled = true;
-        }
-    }
-
     @Test
     void testStopAllDevicesAsyncWithInputsOutputs() {
         CompletableFuture<ButtplugMessage> future =
@@ -504,7 +468,7 @@ class ButtplugClientTest {
     void testScheduleWaitTimeout() {
         CompletableFuture<ButtplugMessage> future = new CompletableFuture<>();
         client.scheduleWait(99, future);
-        
+
         // This is tricky as we can't easily advance time in the Timer used by ButtplugClient
         // But we can check if it's in the pending messages if we had access to it.
         // Since we don't, we can't easily test the timeout logic without reflection or better mocking.
@@ -529,26 +493,26 @@ class ButtplugClientTest {
         ServerInfo serverInfo = new ServerInfo("Test Server", 4, 0, 0, 1);
         client.setNextResponse(serverInfo);
         client.setNextResponse(new DeviceList(new HashMap<>(), 2));
-        
+
         client.doHandshake();
-        
+
         assertEquals(ButtplugClient.ConnectionState.CONNECTED, client.getConnectionState());
     }
 
     @Test
     void testOnMessageBranches() {
         client.setScanningFinishedHandler(() -> scanningFinishedCalled.set(true));
-        
+
         // Test Ping branch (should be ignored by client for now, but covered)
         client.onMessage(Arrays.asList(new Ping(0)));
-        
+
         // Test Ok for unknown ID
         client.onMessage(Arrays.asList(new Ok(999)));
-        
+
         // Test DeviceList branch when NOT disconnected
         client.setConnectionState(ButtplugClient.ConnectionState.CONNECTED);
         client.onMessage(Arrays.asList(new DeviceList(new HashMap<>(), 0)));
-        
+
         // Test ScanningFinished
         client.onMessage(Arrays.asList(new ScanningFinished()));
         assertTrue(scanningFinishedCalled.get());
@@ -556,32 +520,82 @@ class ButtplugClientTest {
 
     @Test
     void testEventsAccessors() {
-        IDeviceAddedEvent added = device -> {};
+        IDeviceAddedEvent added = device -> {
+        };
         client.setDeviceAddedHandler(added);
         assertEquals(added, client.getDeviceAddedHandler());
 
-        IDeviceChangedEvent changed = device -> {};
+        IDeviceChangedEvent changed = device -> {
+        };
         client.setDeviceChangedHandler(changed);
         assertEquals(changed, client.getDeviceChanged());
 
-        IDeviceRemovedEvent removed = device -> {};
+        IDeviceRemovedEvent removed = device -> {
+        };
         client.setDeviceRemovedHandler(removed);
         assertEquals(removed, client.getDeviceRemovedHandler());
 
-        IScanningEvent scanning = () -> {};
+        IScanningEvent scanning = () -> {
+        };
         client.setScanningFinishedHandler(scanning);
         assertEquals(scanning, client.getScanningFinishedHandler());
 
-        IErrorEvent error = e -> {};
+        IErrorEvent error = e -> {
+        };
         client.setErrorHandler(error);
         assertEquals(error, client.getErrorHandler());
 
-        IInputEvent sensor = reading -> {};
+        IInputEvent sensor = reading -> {
+        };
         client.setInputHandler(sensor);
         assertEquals(sensor, client.getInputHandler());
 
-        IConnectedEvent connected = c -> {};
+        IConnectedEvent connected = c -> {
+        };
         client.setOnConnected(connected);
         assertEquals(connected, client.getOnConnectedHandler());
+    }
+
+    /**
+     * Concrete implementation of ButtplugClient for testing purposes.
+     */
+    private static class TestButtplugClient extends ButtplugClient {
+        private final List<ButtplugMessage> messageQueue = new ArrayList<>();
+        ButtplugMessage lastSentMessage;
+        List<ButtplugMessage> sentMessages = new ArrayList<>();
+        boolean cleanupCalled = false;
+        private int queueIndex = 0;
+
+        TestButtplugClient(final String clientName) {
+            super(clientName);
+        }
+
+        public void setNextResponse(final ButtplugMessage message) {
+            messageQueue.add(message);
+        }
+
+        @Override
+        protected CompletableFuture<ButtplugMessage> sendMessage(final ButtplugMessage msg) {
+            lastSentMessage = msg;
+            sentMessages.add(msg);
+
+            CompletableFuture<ButtplugMessage> future = new CompletableFuture<>();
+            scheduleWait(msg.getId(), future);
+
+            if (queueIndex < messageQueue.size()) {
+                ButtplugMessage response = messageQueue.get(queueIndex++);
+                response.setId(msg.getId());
+                onMessage(Collections.singletonList(response));
+            } else {
+                onMessage(Collections.singletonList(new Ok(msg.getId())));
+            }
+
+            return future;
+        }
+
+        @Override
+        protected void cleanup() {
+            cleanupCalled = true;
+        }
     }
 }

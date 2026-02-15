@@ -293,13 +293,13 @@ class ButtplugClientDeviceTest {
     @Test
     void testSendStopDeviceCmdVariants() {
         assertNotNull(clientDevice.sendStopDeviceCmd(true, false));
-        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Boolean.TRUE.equals(((StopCmd)msg).getInputs()) && Boolean.FALSE.equals(((StopCmd)msg).getOutputs())));
+        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Boolean.TRUE.equals(((StopCmd) msg).getInputs()) && Boolean.FALSE.equals(((StopCmd) msg).getOutputs())));
 
         assertNotNull(clientDevice.sendStopDeviceCmd(2));
-        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Integer.valueOf(2).equals(((StopCmd)msg).getFeatureIndex())));
+        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Integer.valueOf(2).equals(((StopCmd) msg).getFeatureIndex())));
 
         assertNotNull(clientDevice.sendStopDeviceCmd(3, false, true));
-        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Integer.valueOf(3).equals(((StopCmd)msg).getFeatureIndex()) && Boolean.FALSE.equals(((StopCmd)msg).getInputs()) && Boolean.TRUE.equals(((StopCmd)msg).getOutputs())));
+        verify(mockClient).sendMessage(argThat(msg -> msg instanceof StopCmd && Integer.valueOf(3).equals(((StopCmd) msg).getFeatureIndex()) && Boolean.FALSE.equals(((StopCmd) msg).getInputs()) && Boolean.TRUE.equals(((StopCmd) msg).getOutputs())));
     }
 
     @Test

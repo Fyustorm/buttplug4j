@@ -13,33 +13,49 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+/**
+ * ButtplugDiscover.
+ */
 public final class ButtplugDiscover implements ServiceListener, Closeable {
+    /**
+     * Known servers.
+     */
     private final ConcurrentHashMap<String, ConcurrentSkipListSet<URI>> servers = new ConcurrentHashMap<>();
+    /**
+     * mDNS implementation.
+     */
     private final JmmDNS jmmdns;
-    private DiscovereyEventHandler discovereyEventHandler = null;
+    /**
+     * Event handler.
+     */
+    private DiscovereyEventHandler discovereyEventHandler;
 
-    public ButtplugDiscover(DiscovereyEventHandler discovereyEventHandler) {
-        this.discovereyEventHandler = discovereyEventHandler;
+    /**
+     * Constructor.
+     *
+     * @param aDiscovereyEventHandler event handler
+     */
+    public ButtplugDiscover(final DiscovereyEventHandler aDiscovereyEventHandler) {
+        this.discovereyEventHandler = aDiscovereyEventHandler;
         jmmdns = JmmDNS.Factory.getInstance();
         jmmdns.addServiceListener("_intiface_engine._tcp.local.", this);
     }
 
-
     @Override
-    public void serviceAdded(ServiceEvent serviceEvent) {
+    public void serviceAdded(final ServiceEvent serviceEvent) {
         // Not used
     }
 
     @Override
-    public void serviceRemoved(ServiceEvent event) {
+    public void serviceRemoved(final ServiceEvent event) {
         servers.remove(event.getInfo().getName());
         if (discovereyEventHandler != null) {
-            discovereyEventHandler.LostButtplug(event.getInfo().getName());
+            discovereyEventHandler.lostButtplug(event.getInfo().getName());
         }
     }
 
     @Override
-    public void serviceResolved(ServiceEvent event) {
+    public void serviceResolved(final ServiceEvent event) {
         ConcurrentSkipListSet<URI> set = new ConcurrentSkipListSet<>();
         for (Inet4Address addr : event.getInfo().getInet4Addresses()) {
             try {
@@ -56,11 +72,16 @@ public final class ButtplugDiscover implements ServiceListener, Closeable {
         }
 
         if (discovereyEventHandler != null) {
-            discovereyEventHandler.FoundButtplug(event.getName(), set);
+            discovereyEventHandler.foundButtplug(event.getName(), set);
         }
     }
 
-    public ConcurrentHashMap<String, ConcurrentSkipListSet<URI>> GetServers() {
+    /**
+     * Get known servers.
+     *
+     * @return servers
+     */
+    public ConcurrentHashMap<String, ConcurrentSkipListSet<URI>> getServers() {
         return servers;
     }
 
@@ -69,10 +90,24 @@ public final class ButtplugDiscover implements ServiceListener, Closeable {
         jmmdns.close();
     }
 
+    /**
+     * DiscovereyEventHandler interface.
+     */
     public interface DiscovereyEventHandler {
-        void FoundButtplug(String name, Set<URI> addresses);
+        /**
+         * Called when Buttplug server found.
+         *
+         * @param name      name
+         * @param addresses addresses
+         */
+        void foundButtplug(String name, Set<URI> addresses);
 
-        void LostButtplug(String name);
+        /**
+         * Called when Buttplug server lost.
+         *
+         * @param name name
+         */
+        void lostButtplug(String name);
     }
 
 }

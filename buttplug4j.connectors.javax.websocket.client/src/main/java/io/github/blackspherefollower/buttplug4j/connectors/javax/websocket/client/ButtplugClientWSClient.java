@@ -14,15 +14,36 @@ import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * ButtplugClientWSClient using Javax WebSocket.
+ */
 @ClientEndpoint
 public final class ButtplugClientWSClient extends ButtplugClientWSEndpoint {
 
+    /**
+     * WebSocket container.
+     */
     private WebSocketContainer client;
 
+    /**
+     * Constructor.
+     *
+     * @param clientName client name
+     */
     public ButtplugClientWSClient(final String clientName) {
         super(clientName);
     }
 
+    /**
+     * Connect to server.
+     *
+     * @param url server URL
+     * @throws IllegalStateException if already open
+     * @throws DeploymentException   if deployment fails
+     * @throws IOException           if IO error occurs
+     * @throws ExecutionException    if execution fails
+     * @throws InterruptedException  if interrupted
+     */
     public void connect(final URI url) throws IllegalStateException, DeploymentException, IOException,
             ExecutionException, InterruptedException {
 
@@ -31,7 +52,7 @@ public final class ButtplugClientWSClient extends ButtplugClientWSEndpoint {
         }
         setConnectionState(ButtplugClient.ConnectionState.CONNECTING);
 
-        IConnectedEvent stashCallback = getOnConnected();
+        IConnectedEvent stashCallback = getOnConnectedHandler();
 
         CompletableFuture<Boolean> promise = new CompletableFuture<>();
         setOnConnected(client -> promise.complete(true));
@@ -42,12 +63,13 @@ public final class ButtplugClientWSClient extends ButtplugClientWSEndpoint {
 
         // Restore and echo down the line
         setOnConnected(stashCallback);
-        if (stashCallback != null)
+        if (stashCallback != null) {
             stashCallback.onConnected(this);
+        }
     }
 
+    @Override
     protected void cleanup() {
-
         if (getSession() != null) {
             try {
                 getSession().close();
@@ -60,6 +82,4 @@ public final class ButtplugClientWSClient extends ButtplugClientWSEndpoint {
         LifeCycle.stop(client);
         client = null;
     }
-
-
 }

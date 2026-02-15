@@ -7,66 +7,133 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
+/**
+ * DeviceFeature.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class DeviceFeature {
 
+    /**
+     * Feature index.
+     */
     @JsonProperty(value = "FeatureIndex", required = true)
     private int featureIndex;
+    /**
+     * Feature description.
+     */
     @JsonProperty(value = "FeatureDescription", required = true)
     private String featureDescription;
+    /**
+     * Output descriptors.
+     */
     @JsonProperty(value = "Output", required = false)
     @JsonDeserialize(using = OutputDescriptorSetDeserialiser.class)
     @JsonSerialize(using = OutputDescriptorSetSerialiser.class)
     private ArrayList<OutputDescriptor> output;
+    /**
+     * Input descriptors.
+     */
     @JsonProperty(value = "Input", required = false)
     @JsonDeserialize(using = InputDescriptorSetDeserialiser.class)
     @JsonSerialize(using = InputDescriptorSetSerialiser.class)
     private ArrayList<InputDescriptor> input;
 
+    /**
+     * Constructor.
+     */
     public DeviceFeature() {
     }
 
+    /**
+     * Get feature description.
+     *
+     * @return description
+     */
     public String getFeatureDescription() {
         return featureDescription;
     }
 
-    public void setFeatureDescription(String featureDescription) {
-        this.featureDescription = featureDescription;
+    /**
+     * Set feature description.
+     *
+     * @param aFeatureDescription description
+     */
+    public void setFeatureDescription(final String aFeatureDescription) {
+        this.featureDescription = aFeatureDescription;
     }
 
+    /**
+     * Get feature index.
+     *
+     * @return index
+     */
     public int getFeatureIndex() {
         return featureIndex;
     }
 
-    public void setFeatureIndex(int featureIndex) {
-        this.featureIndex = featureIndex;
+    /**
+     * Set feature index.
+     *
+     * @param aFeatureIndex index
+     */
+    public void setFeatureIndex(final int aFeatureIndex) {
+        this.featureIndex = aFeatureIndex;
     }
 
+    /**
+     * Get output descriptors.
+     *
+     * @return output
+     */
     public ArrayList<OutputDescriptor> getOutput() {
         return output;
     }
 
-    public void setOutput(ArrayList<OutputDescriptor> output) {
-        this.output = output;
+    /**
+     * Set output descriptors.
+     *
+     * @param aOutput output
+     */
+    public void setOutput(final ArrayList<OutputDescriptor> aOutput) {
+        this.output = aOutput;
     }
 
+    /**
+     * Get input descriptors.
+     *
+     * @return input
+     */
     public ArrayList<InputDescriptor> getInput() {
         return input;
     }
 
-    public void setInput(ArrayList<InputDescriptor> input) {
-        this.input = input;
+    /**
+     * Set input descriptors.
+     *
+     * @param aInput input
+     */
+    public void setInput(final ArrayList<InputDescriptor> aInput) {
+        this.input = aInput;
     }
 
+    /**
+     * OutputDescriptor interface.
+     */
     @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
     @JsonSubTypes({
             @JsonSubTypes.Type(value = DeviceFeature.Vibrate.class, name = "Vibrate"),
@@ -82,24 +149,51 @@ public final class DeviceFeature {
     public interface OutputDescriptor {
     }
 
-    public static class SteppedOutputDescriptor implements OutputDescriptor {
+    /**
+     * SteppedOutputDescriptor.
+     */
+    public abstract static class SteppedOutputDescriptor implements OutputDescriptor {
+        /**
+         * Value range.
+         */
         @JsonProperty(value = "Value", required = true)
         private int[] value;
 
-        public SteppedOutputDescriptor(int[] value) {
-            this.value = value;
+        /**
+         * Constructor.
+         *
+         * @param aValue value range
+         */
+        public SteppedOutputDescriptor(final int[] aValue) {
+            this.value = aValue;
         }
 
+        /**
+         * Get value range.
+         *
+         * @return range
+         */
         public int[] getValue() {
             return value;
         }
 
-        public void setStepCount(int[] value) {
-            this.value = value;
+        /**
+         * Set value range.
+         *
+         * @param aValue range
+         */
+        public void setStepCount(final int[] aValue) {
+            this.value = aValue;
         }
 
+        /**
+         * Compares with other objects.
+         * If extending, either call this first or compare the value range.
+         *
+         * @param o other
+         */
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
@@ -109,123 +203,258 @@ public final class DeviceFeature {
             SteppedOutputDescriptor that = (SteppedOutputDescriptor) o;
             return java.util.Arrays.equals(value, that.value);
         }
+
+        /**
+         * Generates the hashcode based on the value range array.
+         */
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(value);
+        }
     }
 
-    public static class Vibrate extends SteppedOutputDescriptor {
-        public Vibrate(int[] value) {
+    /**
+     * Vibrate output.
+     */
+    public static final class Vibrate extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Vibrate(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Vibrate() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Rotate extends SteppedOutputDescriptor {
-        public Rotate(int[] value) {
+    /**
+     * Rotate output.
+     */
+    public static final class Rotate extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Rotate(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Rotate() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Oscillate extends SteppedOutputDescriptor {
-        public Oscillate(int[] value) {
+    /**
+     * Oscillate output.
+     */
+    public static final class Oscillate extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Oscillate(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Oscillate() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Constrict extends SteppedOutputDescriptor {
-        public Constrict(int[] value) {
+    /**
+     * Constrict output.
+     */
+    public static final class Constrict extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Constrict(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Constrict() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Spray extends SteppedOutputDescriptor {
-        public Spray(int[] value) {
+    /**
+     * Spray output.
+     */
+    public static final class Spray extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Spray(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Spray() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Temperature extends SteppedOutputDescriptor {
-        public Temperature(int[] value) {
+    /**
+     * Temperature output.
+     */
+    public static final class Temperature extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Temperature(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Temperature() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Led extends SteppedOutputDescriptor {
-        public Led(int[] value) {
+    /**
+     * Led output.
+     */
+    public static final class Led extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Led(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Led() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class Position extends SteppedOutputDescriptor {
-        public Position(int[] value) {
+    /**
+     * Position output.
+     */
+    public static final class Position extends SteppedOutputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param value range
+         */
+        public Position(final int[] value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Position() {
             super(new int[]{0, 0});
         }
     }
 
-    public static class HwPositionWithDuration extends SteppedOutputDescriptor {
+    /**
+     * HW Position with duration output.
+     */
+    public static final class HwPositionWithDuration extends SteppedOutputDescriptor {
+        /**
+         * Duration range.
+         */
         @JsonProperty(value = "Duration", required = true)
         private int[] duration;
 
-        public HwPositionWithDuration(int[] value, int[] duration) {
+        /**
+         * Constructor.
+         *
+         * @param value     position range
+         * @param aDuration duration range
+         */
+        public HwPositionWithDuration(final int[] value, final int[] aDuration) {
             super(value);
-            this.duration = duration;
+            this.duration = aDuration;
         }
 
+        /**
+         * Constructor.
+         */
         public HwPositionWithDuration() {
             super(new int[]{0, 0});
             this.duration = new int[]{0, 0};
         }
 
+        /**
+         * Get duration range.
+         *
+         * @return range
+         */
         public int[] getDuration() {
             return duration;
         }
 
-        public void setDuration(int[] duration) {
-            this.duration = duration;
+        /**
+         * Set duration range.
+         *
+         * @param aDuration range
+         */
+        public void setDuration(final int[] aDuration) {
+            this.duration = aDuration;
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
+            if (!super.equals(o)) {
+                return false;
+            }
             HwPositionWithDuration that = (HwPositionWithDuration) o;
-            return java.util.Arrays.equals(getValue(), that.getValue()) && java.util.Arrays.equals(duration, that.duration);
+            return java.util.Arrays.equals(duration, that.duration);
+        }
+
+        @Override
+        public int hashCode() {
+            final int magic = 31;
+            int result = super.hashCode();
+            result = magic * result + Arrays.hashCode(duration);
+            return result;
         }
     }
 
+    /**
+     * InputDescriptor.
+     */
     @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
     @JsonSubTypes({
             @JsonSubTypes.Type(value = DeviceFeature.Battery.class, name = "Battery"),
@@ -234,47 +463,95 @@ public final class DeviceFeature {
             @JsonSubTypes.Type(value = DeviceFeature.Pressure.class, name = "Pressure"),
             @JsonSubTypes.Type(value = DeviceFeature.PositionInput.class, name = "Position")
     })
-    public static class InputDescriptor {
+    public abstract static class InputDescriptor {
+        /**
+         * Supported command types.
+         */
         @JsonProperty(value = "Command", required = true)
         private ArrayList<InputCommandType> input;
 
-        public InputDescriptor(ArrayList<InputCommandType> input) {
-            this.input = input;
+        /**
+         * Constructor.
+         *
+         * @param aInput command types
+         */
+        public InputDescriptor(final ArrayList<InputCommandType> aInput) {
+            this.input = aInput;
         }
 
+        /**
+         * Get command types.
+         *
+         * @return command types
+         */
         public ArrayList<InputCommandType> getInput() {
             return input;
         }
 
-        public void setInput(ArrayList<InputCommandType> input) {
-            this.input = input;
+        /**
+         * Set command types.
+         *
+         * @param aInput command types
+         */
+        public void setInput(final ArrayList<InputCommandType> aInput) {
+            this.input = aInput;
         }
     }
 
-    public static class RangedInputDescriptor extends InputDescriptor {
+    /**
+     * RangedInputDescriptor.
+     */
+    public abstract static class RangedInputDescriptor extends InputDescriptor {
+        /**
+         * Value range.
+         */
         @JsonProperty(value = "Value", required = true)
         private int[][] valueRange;
 
-        public RangedInputDescriptor(ArrayList<InputCommandType> input, int[][] valueRange) {
+        /**
+         * Constructor.
+         *
+         * @param input       command types
+         * @param aValueRange value range
+         */
+        public RangedInputDescriptor(final ArrayList<InputCommandType> input, final int[][] aValueRange) {
             super(input);
-            this.valueRange = valueRange;
+            this.valueRange = aValueRange;
         }
 
+        /**
+         * Constructor.
+         */
         public RangedInputDescriptor() {
             super(new ArrayList<>());
             this.valueRange = new int[][]{{0, 0}, {0, 0}};
         }
 
+        /**
+         * Get value range.
+         *
+         * @return range
+         */
         public int[][] getValueRange() {
             return valueRange;
         }
 
-        public void setValueRange(int[][] valueRange) {
-            this.valueRange = valueRange;
+        /**
+         * Set value range.
+         *
+         * @param aValueRange range
+         */
+        public void setValueRange(final int[][] aValueRange) {
+            this.valueRange = aValueRange;
         }
 
+        /**
+         * Compares objects based on valueRange 2d array.
+         * @param o   the reference object with which to compare.
+         * @return equality
+         */
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
@@ -282,6 +559,9 @@ public final class DeviceFeature {
                 return false;
             }
             RangedInputDescriptor that = (RangedInputDescriptor) o;
+            if (valueRange == null || that.valueRange == null) {
+                return valueRange == that.valueRange;
+            }
             if (valueRange.length != that.valueRange.length) {
                 return false;
             }
@@ -292,85 +572,169 @@ public final class DeviceFeature {
             }
             return true;
         }
+
+        /**
+         * Hashcode based on valueRange 2d array.
+         * @return hashcode based on valueRange 2d array.
+         */
+        @Override
+        public int hashCode() {
+            final int magic = 31;
+            int result = 0;
+            if (valueRange != null) {
+                for (int[] element : valueRange) {
+                    result = magic * result + Arrays.hashCode(element);
+                }
+            }
+            return result;
+        }
     }
 
-    public static class Battery extends RangedInputDescriptor {
-
-        public Battery(ArrayList<InputCommandType> input, int[][] valueRange) {
+    /**
+     * Battery input.
+     */
+    public static final class Battery extends RangedInputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param input      command types
+         * @param valueRange range
+         */
+        public Battery(final ArrayList<InputCommandType> input, final int[][] valueRange) {
             super(input, valueRange);
         }
 
+        /**
+         * Constructor.
+         */
         public Battery() {
             super();
         }
     }
 
-    public static class Rssi extends RangedInputDescriptor {
-        public Rssi(ArrayList<InputCommandType> input, int[][] valueRange) {
+    /**
+     * RSSI input.
+     */
+    public static final class Rssi extends RangedInputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param input      command types
+         * @param valueRange range
+         */
+        public Rssi(final ArrayList<InputCommandType> input, final int[][] valueRange) {
             super(input, valueRange);
         }
 
+        /**
+         * Constructor.
+         */
         public Rssi() {
             super();
         }
     }
 
-    public static class Button extends RangedInputDescriptor {
-        public Button(ArrayList<InputCommandType> input, int[][] valueRange) {
+    /**
+     * Button input.
+     */
+    public static final class Button extends RangedInputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param input      command types
+         * @param valueRange range
+         */
+        public Button(final ArrayList<InputCommandType> input, final int[][] valueRange) {
             super(input, valueRange);
         }
 
+        /**
+         * Constructor.
+         */
         public Button() {
             super();
         }
     }
 
-    public static class Pressure extends RangedInputDescriptor {
-        public Pressure(ArrayList<InputCommandType> input, int[][] valueRange) {
+    /**
+     * Pressure input.
+     */
+    public static final class Pressure extends RangedInputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param input      command types
+         * @param valueRange range
+         */
+        public Pressure(final ArrayList<InputCommandType> input, final int[][] valueRange) {
             super(input, valueRange);
         }
 
+        /**
+         * Constructor.
+         */
         public Pressure() {
             super();
         }
     }
 
-    public static class PositionInput extends RangedInputDescriptor {
-        public PositionInput(ArrayList<InputCommandType> input, int[][] valueRange) {
+    /**
+     * Position input.
+     */
+    public static final class PositionInput extends RangedInputDescriptor {
+        /**
+         * Constructor.
+         *
+         * @param input      command types
+         * @param valueRange range
+         */
+        public PositionInput(final ArrayList<InputCommandType> input, final int[][] valueRange) {
             super(input, valueRange);
         }
 
+        /**
+         * Constructor.
+         */
         public PositionInput() {
             super();
         }
     }
 
+    /**
+     * OutputDescriptorSetDeserialiser.
+     */
     static class OutputDescriptorSetDeserialiser extends JsonDeserializer<ArrayList<OutputDescriptor>> {
 
         @Override
-        public ArrayList<OutputDescriptor> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        public ArrayList<OutputDescriptor> deserialize(final JsonParser jsonParser,
+                                                       final DeserializationContext deserializationContext)
+                throws IOException {
             ObjectMapper mapper = ((ObjectMapper) jsonParser.getCodec());
             ArrayList<OutputDescriptor> ret = new ArrayList<OutputDescriptor>();
             try {
                 TreeNode tree = jsonParser.readValueAsTree();
-                for (Iterator<String> it = tree.fieldNames(); it.hasNext(); ) {
+                for (Iterator<String> it = tree.fieldNames(); it.hasNext();) {
                     String f = it.next();
                     ObjectNode node = mapper.createObjectNode();
                     node.set(f, mapper.readTree(tree.get(f).traverse(mapper)));
                     ret.add(node.traverse(mapper).readValueAs(OutputDescriptor.class));
                 }
             } catch (Exception e) {
-                System.out.println("Unknown OutputDescriptor: " + jsonParser.readValueAsTree());
                 // unknown type
             }
             return ret;
         }
     }
 
+    /**
+     * OutputDescriptorSetSerialiser.
+     */
     static class OutputDescriptorSetSerialiser extends JsonSerializer<ArrayList<OutputDescriptor>> {
 
         @Override
-        public void serialize(ArrayList<OutputDescriptor> outputDescriptors, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        public void serialize(final ArrayList<OutputDescriptor> outputDescriptors,
+                              final JsonGenerator jsonGenerator,
+                              final SerializerProvider serializerProvider) throws IOException {
 
             ObjectMapper mapper = ((ObjectMapper) jsonGenerator.getCodec());
             ObjectNode node = null;
@@ -379,10 +743,10 @@ public final class DeviceFeature {
                     node = mapper.createObjectNode();
                 }
 
-                TreeNode n = mapper.readValue(mapper.writeValueAsString(outputDescriptor), JsonNode.class).traverse(mapper).readValueAsTree();
-                for (Iterator<String> it = n.fieldNames(); it.hasNext(); ) {
+                TreeNode n = mapper.readValue(mapper.writeValueAsString(outputDescriptor), JsonNode.class)
+                        .traverse(mapper).readValueAsTree();
+                for (Iterator<String> it = n.fieldNames(); it.hasNext();) {
                     String f = it.next();
-                    ObjectNode on = mapper.createObjectNode();
                     node.set(f, mapper.readTree(n.get(f).traverse(mapper)));
                 }
             }
@@ -390,32 +754,41 @@ public final class DeviceFeature {
         }
     }
 
+    /**
+     * InputDescriptorSetDeserialiser.
+     */
     static class InputDescriptorSetDeserialiser extends JsonDeserializer<ArrayList<InputDescriptor>> {
 
         @Override
-        public ArrayList<InputDescriptor> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        public ArrayList<InputDescriptor> deserialize(final JsonParser jsonParser,
+                                                      final DeserializationContext deserializationContext)
+                throws IOException {
             ObjectMapper mapper = ((ObjectMapper) jsonParser.getCodec());
             ArrayList<InputDescriptor> ret = new ArrayList<InputDescriptor>();
             try {
                 TreeNode tree = jsonParser.readValueAsTree();
-                for (Iterator<String> it = tree.fieldNames(); it.hasNext(); ) {
+                for (Iterator<String> it = tree.fieldNames(); it.hasNext();) {
                     String f = it.next();
                     ObjectNode node = mapper.createObjectNode();
                     node.set(f, mapper.readTree(tree.get(f).traverse(mapper)));
                     ret.add(node.traverse(mapper).readValueAs(InputDescriptor.class));
                 }
             } catch (Exception e) {
-                System.out.println("Unknown InputDescriptor: " + jsonParser.readValueAsTree());
                 // unknown type
             }
             return ret;
         }
     }
 
+    /**
+     * InputDescriptorSetSerialiser.
+     */
     static class InputDescriptorSetSerialiser extends JsonSerializer<ArrayList<InputDescriptor>> {
 
         @Override
-        public void serialize(ArrayList<InputDescriptor> inputDescriptors, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        public void serialize(final ArrayList<InputDescriptor> inputDescriptors,
+                              final JsonGenerator jsonGenerator,
+                              final SerializerProvider serializerProvider) throws IOException {
 
             ObjectMapper mapper = ((ObjectMapper) jsonGenerator.getCodec());
             ObjectNode node = null;
@@ -424,10 +797,10 @@ public final class DeviceFeature {
                     node = mapper.createObjectNode();
                 }
 
-                TreeNode n = mapper.readValue(mapper.writeValueAsString(inputDescriptor), JsonNode.class).traverse(mapper).readValueAsTree();
-                for (Iterator<String> it = n.fieldNames(); it.hasNext(); ) {
+                TreeNode n = mapper.readValue(mapper.writeValueAsString(inputDescriptor), JsonNode.class)
+                        .traverse(mapper).readValueAsTree();
+                for (Iterator<String> it = n.fieldNames(); it.hasNext();) {
                     String f = it.next();
-                    ObjectNode on = mapper.createObjectNode();
                     node.set(f, mapper.readTree(n.get(f).traverse(mapper)));
                 }
             }

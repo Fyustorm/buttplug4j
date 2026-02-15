@@ -17,7 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class DeviceListTest {
 
@@ -90,7 +94,6 @@ public class DeviceListTest {
         assertNull(dev2Features.get(1).getOutput());
         assertEquals(1, dev2Features.get(1).getInput().size());
         assertArrayEquals(new String[]{"Rssi"}, dev2Features.get(1).getInput().stream().map(inputDescriptor -> inputDescriptor.getClass().getSimpleName()).toArray());
-
 
         String jsonOut = parser.formatJson(msgs);
         assertEquals(testStr, jsonOut);

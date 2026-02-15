@@ -9,22 +9,44 @@ import io.github.blackspherefollower.buttplug4j.client.ButtplugDeviceException;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugConsts;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 
+/**
+ * Error message.
+ */
 public final class Error extends ButtplugMessage {
 
+    /**
+     * Error code.
+     */
     @JsonProperty(value = "ErrorCode", required = true)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private ErrorClass errorCode;
+    /**
+     * Error message string.
+     */
     @JsonProperty(value = "ErrorMessage", required = true)
     private String errorMessage;
+    /**
+     * Underlying exception.
+     */
     @JsonIgnore
     private ButtplugException exception = null;
 
-    public Error(final String errorMessage, final ErrorClass errorCode, final int id) {
+    /**
+     * Constructor.
+     *
+     * @param aErrorMessage error message
+     * @param aErrorCode    error code
+     * @param id            message ID
+     */
+    public Error(final String aErrorMessage, final ErrorClass aErrorCode, final int id) {
         super(id);
-        this.setErrorMessage(errorMessage);
-        this.setErrorCode(errorCode);
+        this.setErrorMessage(aErrorMessage);
+        this.setErrorCode(aErrorCode);
     }
 
+    /**
+     * Constructor.
+     */
     @SuppressWarnings("unused")
     private Error() {
         super(ButtplugConsts.DEFAULT_MSG_ID);
@@ -32,52 +54,106 @@ public final class Error extends ButtplugMessage {
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
     }
 
-    public Error(ButtplugException e) {
+    /**
+     * Constructor from exception.
+     *
+     * @param e exception
+     */
+    public Error(final ButtplugException e) {
         super(ButtplugConsts.SYSTEM_MSG_ID);
         this.setErrorMessage(e.getMessage());
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
         this.exception = e;
     }
 
-    public Error(ButtplugException e, final int id) {
+    /**
+     * Constructor from exception and ID.
+     *
+     * @param e  exception
+     * @param id message ID
+     */
+    public Error(final ButtplugException e, final int id) {
         super(id);
         this.setErrorMessage(e.getMessage());
         this.setErrorCode(ErrorClass.ERROR_UNKNOWN);
         this.exception = e;
     }
 
+    /**
+     * Get error code.
+     *
+     * @return error code
+     */
     public ErrorClass getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(final ErrorClass errorCode) {
-        this.errorCode = errorCode;
+    /**
+     * Set error code.
+     *
+     * @param aErrorCode error code
+     */
+    public void setErrorCode(final ErrorClass aErrorCode) {
+        this.errorCode = aErrorCode;
     }
 
+    /**
+     * Get error message.
+     *
+     * @return error message
+     */
     public String getErrorMessage() {
         return errorMessage;
     }
 
-    public void setErrorMessage(final String errorMessage) {
-        this.errorMessage = errorMessage;
+    /**
+     * Set error message.
+     *
+     * @param aErrorMessage error message
+     */
+    public void setErrorMessage(final String aErrorMessage) {
+        this.errorMessage = aErrorMessage;
     }
 
+    /**
+     * Get underlying exception.
+     *
+     * @return exception
+     */
     public ButtplugException getException() {
-        if(exception != null) {
+        if (exception != null) {
             return exception;
-        } else if ( errorCode == ErrorClass.ERROR_DEVICE ) {
-            return new ButtplugDeviceException( errorMessage );
-        } else if( errorCode != null ){
-            return new ButtplugClientException( errorMessage );
+        } else if (errorCode == ErrorClass.ERROR_DEVICE) {
+            return new ButtplugDeviceException(errorMessage);
+        } else if (errorCode != null) {
+            return new ButtplugClientException(errorMessage);
         }
         return null;
     }
 
+    /**
+     * Error class enum.
+     */
     public enum ErrorClass {
+        /**
+         * Unknown.
+         */
         ERROR_UNKNOWN,
+        /**
+         * Init.
+         */
         ERROR_INIT,
+        /**
+         * Ping.
+         */
         ERROR_PING,
+        /**
+         * Message.
+         */
         ERROR_MSG,
+        /**
+         * Device.
+         */
         ERROR_DEVICE,
     }
 }

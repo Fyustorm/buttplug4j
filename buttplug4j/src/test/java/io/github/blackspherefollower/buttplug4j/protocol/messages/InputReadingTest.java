@@ -7,7 +7,6 @@ import io.github.blackspherefollower.buttplug4j.protocol.ButtplugJsonMessagePars
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugProtocolException;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -18,7 +17,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class InputReadingTest {
 
@@ -78,7 +79,7 @@ public class InputReadingTest {
         assertEquals(0, ((InputReading) msgs.get(0)).getDeviceIndex());
         assertEquals(1, ((InputReading) msgs.get(0)).getFeatureIndex());
         assertEquals(InputReading.BatteryData.class, ((InputReading) msgs.get(0)).getData().getClass());
-        assertEquals(100, ((InputReading.BatteryData)((InputReading) msgs.get(0)).getData()).getValue());
+        assertEquals(100, ((InputReading.BatteryData) ((InputReading) msgs.get(0)).getData()).getValue());
 
         String jsonOut = parser.formatJson(msgs);
         assertEquals(testStr, jsonOut);

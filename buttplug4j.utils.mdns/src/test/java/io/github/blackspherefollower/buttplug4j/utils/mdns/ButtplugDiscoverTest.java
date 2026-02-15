@@ -1,7 +1,6 @@
 package io.github.blackspherefollower.buttplug4j.utils.mdns;
 
 import io.github.blackspherefollower.buttplug4j.utils.test.IntifaceEngineWrapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -16,27 +15,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ButtplugDiscoverTest {
 
     @Test
-    public void TestConnect() throws Exception {
+    public void testConnect() throws Exception {
 
         CompletableFuture<Boolean> seen1 = new CompletableFuture<>();
         CompletableFuture<Boolean> gone1 = new CompletableFuture<>();
 
-        try (
-                IntifaceEngineWrapper wrapper1 = new IntifaceEngineWrapper(new ArrayList<>(Arrays.asList("--broadcast-server-mdns")));
-                ButtplugDiscover discover = new ButtplugDiscover(new ButtplugDiscover.DiscovereyEventHandler() {
-                    @Override
-                    public void FoundButtplug(String name, Set<URI> addresses) {
-                        seen1.complete(true);
-                        System.out.println("WOO, a buttplug appeared : " + name + " : " + String.join(", ", addresses.stream().map(uri -> uri.toString()).collect(Collectors.toList())));
-                    }
+        try (IntifaceEngineWrapper wrapper1 = new IntifaceEngineWrapper(new ArrayList<>(Arrays.asList("--broadcast-server-mdns")));
+             ButtplugDiscover discover = new ButtplugDiscover(new ButtplugDiscover.DiscovereyEventHandler() {
+                 @Override
+                 public void foundButtplug(final String name, final Set<URI> addresses) {
+                     seen1.complete(true);
+                     System.out.println("WOO, a buttplug appeared : " + name + " : " + String.join(", ", addresses.stream().map(URI::toString).collect(Collectors.toList())));
+                 }
 
-                    @Override
-                    public void LostButtplug(String name) {
-                        gone1.complete(true);
-                        System.out.println("Oh... a buttplug disappeared : " + name);
-                    }
-                });
-        ) {
+                 @Override
+                 public void lostButtplug(final String name) {
+                     gone1.complete(true);
+                     System.out.println("Oh... a buttplug disappeared : " + name);
+                 }
+             })) {
 
             assertTrue(seen1.get(15, TimeUnit.SECONDS));
 

@@ -2,7 +2,6 @@ package io.github.blackspherefollower.buttplug4j.client;
 
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 import io.github.blackspherefollower.buttplug4j.protocol.messages.DeviceFeature;
-import io.github.blackspherefollower.buttplug4j.protocol.messages.InputCommandType;
 import io.github.blackspherefollower.buttplug4j.protocol.messages.InputReading;
 import io.github.blackspherefollower.buttplug4j.protocol.messages.OutputCmd;
 import org.junit.jupiter.api.BeforeEach;
@@ -378,7 +377,7 @@ class ButtplugClientDeviceFeatureTest {
         assertTrue(clientFeature.hasTemperature());
         assertFalse(clientFeature.hasBattery());
         assertFalse(clientFeature.hasRSSI());
-        
+
         // Add HwPositionWithDuration
         testFeature.getOutput().add(new DeviceFeature.HwPositionWithDuration(new int[]{0, 25}, new int[]{0, 1000}));
         clientFeature = new ButtplugClientDeviceFeature(mockDevice, testFeature);
@@ -430,7 +429,7 @@ class ButtplugClientDeviceFeatureTest {
     @Test
     void testEqualsAndHashCode() {
         ButtplugClientDeviceFeature same = new ButtplugClientDeviceFeature(mockDevice, testFeature);
-        
+
         DeviceFeature differentFeature = new DeviceFeature();
         differentFeature.setFeatureIndex(1);
         differentFeature.setFeatureDescription("Test Feature");
@@ -441,7 +440,7 @@ class ButtplugClientDeviceFeatureTest {
         assertNotEquals(clientFeature, differentFeatureObj);
         assertNotEquals(clientFeature, null);
         assertNotEquals(clientFeature, new Object());
-        
+
         // Test with different outputs
         DeviceFeature featureWithDifferentOutput = new DeviceFeature();
         featureWithDifferentOutput.setFeatureIndex(0);

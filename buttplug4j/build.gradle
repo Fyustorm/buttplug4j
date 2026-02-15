@@ -34,8 +34,8 @@ tasks.compileJava {
 
 checkstyle {
     configFile = file("${rootDir}/checkstyle.xml")
-    showViolations = false
-    ignoreFailures = true
+    showViolations = true
+    ignoreFailures = false
 }
 test {
     finalizedBy jacocoTestReport

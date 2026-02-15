@@ -13,10 +13,19 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * ButtplugJsonMessageParser.
+ */
 public final class ButtplugJsonMessageParser {
 
+    /**
+     * JSON mapper.
+     */
     private final ObjectMapper mapper;
 
+    /**
+     * Constructor.
+     */
     public ButtplugJsonMessageParser() {
         mapper = JsonMapper.builder()
                 .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
@@ -28,6 +37,13 @@ public final class ButtplugJsonMessageParser {
         mapper.setDefaultTyping(typer);
     }
 
+    /**
+     * Parse JSON to Buttplug messages.
+     *
+     * @param json JSON string
+     * @return list of messages
+     * @throws ButtplugProtocolException if parsing fails
+     */
     public List<ButtplugMessage> parseJson(final String json)
             throws ButtplugProtocolException {
         try {
@@ -37,6 +53,13 @@ public final class ButtplugJsonMessageParser {
         }
     }
 
+    /**
+     * Format Buttplug messages to JSON.
+     *
+     * @param msgs list of messages
+     * @return JSON string
+     * @throws ButtplugProtocolException if formatting fails
+     */
     public String formatJson(final List<ButtplugMessage> msgs)
             throws ButtplugProtocolException {
         try {
@@ -46,10 +69,17 @@ public final class ButtplugJsonMessageParser {
         }
     }
 
-    public String formatJson(final ButtplugMessage msgs)
+    /**
+     * Format a single Buttplug message to JSON.
+     *
+     * @param msg message
+     * @return JSON string
+     * @throws ButtplugProtocolException if formatting fails
+     */
+    public String formatJson(final ButtplugMessage msg)
             throws ButtplugProtocolException {
         try {
-            return mapper.writeValueAsString(new ButtplugMessage[]{msgs});
+            return mapper.writeValueAsString(new ButtplugMessage[]{msg});
         } catch (JsonProcessingException e) {
             throw new ButtplugProtocolException(e);
         }

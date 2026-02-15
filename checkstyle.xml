@@ -56,6 +56,13 @@
         <property name="optional" value="true"/>
     </module>
 
+    <module name="SuppressionSingleFilter">
+        <property name="checks"
+                  value="(MagicNumber|LineLength|JavadocVariable|VisibilityModifier|MissingJavadocMethod|AvoidStarImport|JavadocPackage)" />
+        <property name="files"
+                  value=".+Test.java" />
+    </module>
+
     <!-- Checks that a package-info.java file exists for each package.     -->
     <!-- See https://checkstyle.org/config_javadoc.html#JavadocPackage -->
     <module name="JavadocPackage"/>

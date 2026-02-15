@@ -3,24 +3,49 @@ package io.github.blackspherefollower.buttplug4j.protocol.messages;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugDeviceMessage;
 
+/**
+ * InputCmd message.
+ */
 public class InputCmd extends ButtplugDeviceMessage {
 
+    /**
+     * Feature index.
+     */
     @JsonProperty(value = "FeatureIndex", required = true)
     private int featureIndex;
 
+    /**
+     * Input type.
+     */
     @JsonProperty(value = "Type", required = true)
     private String inputType;
 
+    /**
+     * Input command.
+     */
     @JsonProperty(value = "Command", required = true)
     private InputCommandType inputCommand;
 
-    public InputCmd(int id, final long deviceIndex, final int featureIndex, final String inputType, final InputCommandType inputCommand) {
+    /**
+     * Constructor.
+     *
+     * @param id            message ID
+     * @param deviceIndex   device index
+     * @param aFeatureIndex feature index
+     * @param aInputType    input type
+     * @param aInputCommand command
+     */
+    public InputCmd(final int id, final long deviceIndex, final int aFeatureIndex,
+                    final String aInputType, final InputCommandType aInputCommand) {
         super(id, deviceIndex);
-        this.featureIndex = featureIndex;
-        this.inputType = inputType;
-        this.inputCommand = inputCommand;
+        this.featureIndex = aFeatureIndex;
+        this.inputType = aInputType;
+        this.inputCommand = aInputCommand;
     }
 
+    /**
+     * Constructor.
+     */
     public InputCmd() {
         super(-1, -1);
         this.featureIndex = -1;
@@ -28,28 +53,57 @@ public class InputCmd extends ButtplugDeviceMessage {
         this.inputCommand = InputCommandType.READ;
     }
 
-
-    public int getFeatureIndex() {
+    /**
+     * Get feature index.
+     *
+     * @return index
+     */
+    public final int getFeatureIndex() {
         return featureIndex;
     }
 
-    public void setFeatureIndex(int featureIndex) {
-        this.featureIndex = featureIndex;
+    /**
+     * Set feature index.
+     *
+     * @param aFeatureIndex index
+     */
+    public final void setFeatureIndex(final int aFeatureIndex) {
+        this.featureIndex = aFeatureIndex;
     }
 
-    public String getInputType() {
+    /**
+     * Get input type.
+     *
+     * @return type
+     */
+    public final String getInputType() {
         return inputType;
     }
 
-    public void setInputType(String inputType) {
-        this.inputType = inputType;
+    /**
+     * Set input type.
+     *
+     * @param aInputType type
+     */
+    public final void setInputType(final String aInputType) {
+        this.inputType = aInputType;
     }
 
-    public InputCommandType getInputCommand() {
+    /**
+     * Get input command.
+     *
+     * @return command
+     */
+    public final InputCommandType getInputCommand() {
         return inputCommand;
     }
 
-    public void setInputCommand(InputCommandType inputCommand) {
-        this.inputCommand = inputCommand;
+    /**
+     * Set input command.
+     *
+     * @param aInputCommand command
+     */
+    public final void setInputCommand(final InputCommandType aInputCommand) {
+        this.inputCommand = aInputCommand;
     }
 }

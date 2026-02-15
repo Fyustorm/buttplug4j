@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ButtplugClientWSServerMockTest {
 
     @Test
-    public void TestConnect() throws Exception {
+    public void testConnect() throws Exception {
         int lport = (int) (Math.random() * 63000) + 1025;
         CompletableFuture<Boolean> testDone = new CompletableFuture<>();
         ButtplugClientWSServerExample server = new ButtplugClientWSServerExample(lport, testDone);
@@ -33,11 +33,11 @@ public class ButtplugClientWSServerMockTest {
 
         try (IntifaceEngineWrapper wrapper = new IntifaceEngineWrapper(lport)) {
             Thread.sleep(500);
-            WSDMClient wsdev = new WSDMClient(new URI("ws://localhost:" + wrapper.dport), "LVS-Fake", "A9816725B");
+            WSDMClient wsdev = new WSDMClient(new URI("ws://localhost:" + wrapper.getDport()), "LVS-Fake", "A9816725B");
             testDone.get(10, TimeUnit.SECONDS);
             server.join();
-            assertEquals(wsdev.messages.poll(), "Vibrate:10;");
-            assertEquals(wsdev.messages.poll(), "Vibrate:0;");
+            assertEquals(wsdev.getMessages().poll(), "Vibrate:10;");
+            assertEquals(wsdev.getMessages().poll(), "Vibrate:0;");
         }
 
     }
@@ -47,7 +47,7 @@ public class ButtplugClientWSServerMockTest {
         private final Server server;
         private final ServerConnector connector;
 
-        public ButtplugClientWSServerExample(int port, CompletableFuture<Boolean> testDone) throws Exception {
+        ButtplugClientWSServerExample(final int port, final CompletableFuture<Boolean> testDone) throws Exception {
             server = new Server();
             connector = new ServerConnector(server);
             connector.setPort(port);
@@ -61,21 +61,20 @@ public class ButtplugClientWSServerMockTest {
             server.setHandler(context);
 
             // Configure specific websocket behavior
-            JavaxWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) ->
-            {
+            JavaxWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
                 // Configure default max size
                 wsContainer.setDefaultMaxTextMessageBufferSize(65535);
 
                 // Add websockets
                 wsContainer.addEndpoint(ServerEndpointConfig.Builder.create(ButtplugClientWSEndpoint.class, "/{user}").configurator(new ServerEndpointConfig.Configurator() {
                     @Override
-                    public <T> T getEndpointInstance(Class<T> endpointClass) {
+                    public <T> T getEndpointInstance(final Class<T> endpointClass) {
                         if (endpointClass == ButtplugClientWSEndpoint.class) {
                             ButtplugClientWSServer client = new ButtplugClientWSServer("Java WS Server Buttplug Client");
-                            client.setDeviceAdded(dev -> firstDevice.complete(true));
+                            client.setDeviceAddedHandler(dev -> firstDevice.complete(true));
                             client.setOnConnected(new IConnectedEvent() {
                                 @Override
-                                public void onConnected(ButtplugClient client) {
+                                public void onConnected(final ButtplugClient client) {
                                     new Thread(() -> {
                                         try {
                                             if (client instanceof ButtplugClientWSServer) {
@@ -90,8 +89,8 @@ public class ButtplugClientWSServerMockTest {
                                             firstDevice.get(5, TimeUnit.SECONDS);
                                             for (ButtplugClientDevice dev : client.getDevices()) {
                                                 for (ButtplugClientDeviceFeature feat : dev.getDeviceFeatures().values()) {
-                                                    if (feat.HasVibrate()) {
-                                                        feat.VibrateFloat(0.5F).get();
+                                                    if (feat.hasVibrate()) {
+                                                        feat.runVibrateFloat(0.5F).get();
                                                     }
                                                 }
                                             }

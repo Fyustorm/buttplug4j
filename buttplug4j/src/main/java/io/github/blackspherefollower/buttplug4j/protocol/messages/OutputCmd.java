@@ -5,40 +5,81 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugDeviceMessage;
 
+/**
+ * OutputCmd message.
+ */
 public class OutputCmd extends ButtplugDeviceMessage {
 
-
+    /**
+     * Feature index.
+     */
     @JsonProperty(value = "FeatureIndex", required = true)
     private long featureIndex;
+    /**
+     * Output command.
+     */
     @JsonProperty(value = "Command", required = true)
     private IOutputCommand command;
 
-    public OutputCmd(int id, final long deviceIndex, final long featureIndex) {
+    /**
+     * Constructor.
+     *
+     * @param id            message ID
+     * @param deviceIndex   device index
+     * @param aFeatureIndex feature index
+     */
+    public OutputCmd(final int id, final long deviceIndex, final long aFeatureIndex) {
         super(id, deviceIndex);
-        this.featureIndex = featureIndex;
+        this.featureIndex = aFeatureIndex;
     }
 
+    /**
+     * Constructor.
+     */
     public OutputCmd() {
         super(-1, -1);
         this.featureIndex = -1;
     }
 
+    /**
+     * Get feature index.
+     *
+     * @return index
+     */
     public final long getFeatureIndex() {
         return featureIndex;
     }
 
-    public final void setFeatureIndex(final long deviceIndex) {
-        this.featureIndex = deviceIndex;
+    /**
+     * Set feature index.
+     *
+     * @param aFeatureIndex index
+     */
+    public final void setFeatureIndex(final long aFeatureIndex) {
+        this.featureIndex = aFeatureIndex;
     }
 
+    /**
+     * Get command.
+     *
+     * @return command
+     */
     public final IOutputCommand getCommand() {
         return command;
     }
 
-    public final void setCommand(final IOutputCommand command) {
-        this.command = command;
+    /**
+     * Set command.
+     *
+     * @param aCommand command
+     */
+    public final void setCommand(final IOutputCommand aCommand) {
+        this.command = aCommand;
     }
 
+    /**
+     * IOutputCommand interface.
+     */
     @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
     @JsonSubTypes({
             @JsonSubTypes.Type(value = Vibrate.class, name = "Vibrate"),
@@ -54,127 +95,264 @@ public class OutputCmd extends ButtplugDeviceMessage {
     public interface IOutputCommand {
     }
 
+    /**
+     * ValueCommand abstract class.
+     */
     public abstract static class ValueCommand implements IOutputCommand {
+        /**
+         * Value.
+         */
         @JsonProperty(value = "Value", required = true)
         private int value;
 
-        protected ValueCommand(int value) {
-            this.value = value;
+        /**
+         * Constructor.
+         *
+         * @param aValue value
+         */
+        protected ValueCommand(final int aValue) {
+            this.value = aValue;
         }
+
+        /**
+         * Constructor.
+         */
         protected ValueCommand() {
             this.value = 0;
         }
 
+        /**
+         * Get value.
+         *
+         * @return value
+         */
         public int getValue() {
             return value;
         }
 
-        public void setValue(int value) {
-            this.value = value;
+        /**
+         * Set value.
+         *
+         * @param aValue value
+         */
+        public void setValue(final int aValue) {
+            this.value = aValue;
         }
     }
 
+    /**
+     * Vibrate output.
+     */
     public static class Vibrate extends ValueCommand {
-        public Vibrate(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Vibrate(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Vibrate() {
             super(0);
         }
     }
 
+    /**
+     * Rotate output.
+     */
     public static class Rotate extends ValueCommand {
-        public Rotate(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Rotate(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Rotate() {
             super(0);
         }
     }
 
+    /**
+     * Oscillate output.
+     */
     public static class Oscillate extends ValueCommand {
-        public Oscillate(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Oscillate(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Oscillate() {
             super(0);
         }
     }
 
+    /**
+     * Constrict output.
+     */
     public static class Constrict extends ValueCommand {
-        public Constrict(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Constrict(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Constrict() {
             super(0);
         }
     }
 
+    /**
+     * Spray output.
+     */
     public static class Spray extends ValueCommand {
-        public Spray(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Spray(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Spray() {
             super(0);
         }
     }
 
+    /**
+     * Temperature output.
+     */
     public static class Temperature extends ValueCommand {
-        public Temperature(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Temperature(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Temperature() {
             super(0);
         }
     }
 
+    /**
+     * Led output.
+     */
     public static class Led extends ValueCommand {
-        public Led(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Led(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Led() {
             super(0);
         }
     }
 
+    /**
+     * Position output.
+     */
     public static class Position extends ValueCommand {
-        public Position(int value) {
+        /**
+         * Constructor.
+         *
+         * @param value value
+         */
+        public Position(final int value) {
             super(value);
         }
 
+        /**
+         * Constructor.
+         */
         public Position() {
             super(0);
         }
     }
 
+    /**
+     * HW Position with duration output.
+     */
     public static class HwPositionWithDuration extends ValueCommand {
+        /**
+         * Duration.
+         */
         @JsonProperty(value = "Duration", required = true)
         private int duration;
 
-        public HwPositionWithDuration(int value, int duration) {
+        /**
+         * Constructor.
+         *
+         * @param value     value
+         * @param aDuration duration
+         */
+        public HwPositionWithDuration(final int value, final int aDuration) {
             super(value);
-            this.duration = duration;
+            this.duration = aDuration;
         }
 
+        /**
+         * Constructor.
+         */
         public HwPositionWithDuration() {
             super();
             this.duration = 0;
         }
 
+        /**
+         * Get duration.
+         *
+         * @return duration
+         */
         public int getDuration() {
             return duration;
         }
 
-        public void setDuration(int duration) {
-            this.duration = duration;
+        /**
+         * Set duration.
+         *
+         * @param aDuration duration
+         */
+        public void setDuration(final int aDuration) {
+            this.duration = aDuration;
         }
     }
-
 }

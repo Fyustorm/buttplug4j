@@ -4,68 +4,136 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugConsts;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugMessage;
 
+/**
+ * ServerInfo message.
+ */
 public final class ServerInfo extends ButtplugMessage {
 
+    /**
+     * Protocol version major.
+     */
     @JsonProperty(value = "ProtocolVersionMajor", required = true)
     private int protocolVersionMajor;
 
+    /**
+     * Protocol version minor.
+     */
     @JsonProperty(value = "ProtocolVersionMinor", required = true)
     private int protocolVersionMinor;
 
+    /**
+     * Max ping time.
+     */
     @JsonProperty(value = "MaxPingTime", required = true)
     private long maxPingTime;
 
+    /**
+     * Server name.
+     */
     @JsonProperty(value = "ServerName", required = true)
     private String serverName;
 
-    public ServerInfo(final String serverName, final int protocolVersionMajor, final int protocolVersionMinor, final long maxPingTime, final int id) {
+    /**
+     * Constructor.
+     *
+     * @param aServerName           server name
+     * @param aProtocolVersionMajor major version
+     * @param aProtocolVersionMinor minor version
+     * @param aMaxPingTime          max ping time
+     * @param id                    message ID
+     */
+    public ServerInfo(final String aServerName, final int aProtocolVersionMajor,
+                      final int aProtocolVersionMinor, final long aMaxPingTime, final int id) {
         super(id);
 
-        this.serverName = serverName;
-        this.protocolVersionMajor = protocolVersionMajor;
-        this.protocolVersionMinor = protocolVersionMinor;
-        this.maxPingTime = maxPingTime;
+        this.serverName = aServerName;
+        this.protocolVersionMajor = aProtocolVersionMajor;
+        this.protocolVersionMinor = aProtocolVersionMinor;
+        this.maxPingTime = aMaxPingTime;
     }
 
+    /**
+     * Constructor.
+     */
     @SuppressWarnings("unused")
     private ServerInfo() {
         super(ButtplugConsts.DEFAULT_MSG_ID);
 
         this.serverName = "";
-        this.protocolVersionMajor = 4;
-        this.protocolVersionMinor = 0;
+        this.protocolVersionMajor = ButtplugConsts.PROTOCOL_VERSION_MAJOR;
+        this.protocolVersionMinor = ButtplugConsts.PROTOCOL_VERSION_MINOR;
         this.maxPingTime = 0;
     }
 
+    /**
+     * Get protocol version major.
+     *
+     * @return major version
+     */
     public int getProtocolVersionMajor() {
         return protocolVersionMajor;
     }
 
-    public void setProtocolVersionMajor(final int protocolVersionMajor) {
-        this.protocolVersionMajor = protocolVersionMajor;
+    /**
+     * Set protocol version major.
+     *
+     * @param aProtocolVersionMajor major version
+     */
+    public void setProtocolVersionMajor(final int aProtocolVersionMajor) {
+        this.protocolVersionMajor = aProtocolVersionMajor;
     }
 
+    /**
+     * Get protocol version minor.
+     *
+     * @return minor version
+     */
     public int getProtocolVersionMinor() {
         return protocolVersionMinor;
     }
 
-    public void setProtocolVersionMinor(final int protocolVersionMinor) {
-        this.protocolVersionMinor = protocolVersionMinor;
+    /**
+     * Set protocol version minor.
+     *
+     * @param aProtocolVersionMinor minor version
+     */
+    public void setProtocolVersionMinor(final int aProtocolVersionMinor) {
+        this.protocolVersionMinor = aProtocolVersionMinor;
     }
 
+    /**
+     * Get max ping time.
+     *
+     * @return max ping time
+     */
     public long getMaxPingTime() {
         return maxPingTime;
     }
 
-    public void setMaxPingTime(final long maxPingTime) {
-        this.maxPingTime = maxPingTime;
+    /**
+     * Set max ping time.
+     *
+     * @param aMaxPingTime max ping time
+     */
+    public void setMaxPingTime(final long aMaxPingTime) {
+        this.maxPingTime = aMaxPingTime;
     }
 
+    /**
+     * Get server name.
+     *
+     * @return server name
+     */
     public String getServerName() {
         return serverName;
     }
 
-    public void setServerName(final String serverName) {
-        this.serverName = serverName;
+    /**
+     * Set server name.
+     *
+     * @param aServerName server name
+     */
+    public void setServerName(final String aServerName) {
+        this.serverName = aServerName;
     }
 }

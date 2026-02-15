@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 public class IntifaceEngineWrapper implements Closeable {
 
-    public final int cport;
-    public final int dport;
-    private Process proc = null;
-    private Path userConfig = null;
+    private final int cport;
+    private final int dport;
+    private Process proc;
+    private Path userConfig;
 
     public IntifaceEngineWrapper() throws Exception {
         cport = (int) (Math.random() * 63000) + 1025;
@@ -20,28 +20,36 @@ public class IntifaceEngineWrapper implements Closeable {
         setup(true, new ArrayList<String>());
     }
 
-    public IntifaceEngineWrapper(int lport) throws Exception {
+    public IntifaceEngineWrapper(final int lport) throws Exception {
         cport = lport;
         dport = (int) (Math.random() * 63000) + 1025;
 
         setup(false, new ArrayList<String>());
     }
 
-    public IntifaceEngineWrapper(ArrayList<String> extraArgs) throws Exception {
+    public IntifaceEngineWrapper(final ArrayList<String> extraArgs) throws Exception {
         cport = (int) (Math.random() * 63000) + 1025;
         dport = (int) (Math.random() * 63000) + 1025;
 
         setup(true, extraArgs);
     }
 
-    public void setup(boolean listen, ArrayList<String> extraArgs) throws Exception {
+    public final int getCport() {
+        return cport;
+    }
+
+    public final int getDport() {
+        return dport;
+    }
+
+    public void setup(final boolean listen, final ArrayList<String> extraArgs) throws Exception {
         try {
             Runtime.getRuntime().exec("intiface-engine --version").waitFor();
         } catch (IOException e) {
             org.junit.jupiter.api.Assumptions.abort("intiface-engine not found, skipping tests");
         }
 
-        Path userConfig = Files.createTempFile("user-config_", ".json");
+        userConfig = Files.createTempFile("user-config_", ".json");
         try (
                 InputStream in = new BufferedInputStream(
                         getClass().getResourceAsStream("/user-config.json"));

@@ -5,38 +5,81 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.github.blackspherefollower.buttplug4j.protocol.ButtplugDeviceMessage;
 
+/**
+ * InputReading message.
+ */
 public class InputReading extends ButtplugDeviceMessage {
 
+    /**
+     * Feature index.
+     */
     @JsonProperty(value = "FeatureIndex", required = true)
     private int featureIndex;
+    /**
+     * Input data.
+     */
     @JsonProperty(value = "Reading", required = true)
     private InputData data;
 
-    public InputReading(int id, long deviceIndex, int featureIndex) {
+    /**
+     * Constructor.
+     *
+     * @param id            message ID
+     * @param deviceIndex   device index
+     * @param aFeatureIndex feature index
+     */
+    public InputReading(final int id, final long deviceIndex, final int aFeatureIndex) {
         super(id, deviceIndex);
-        this.featureIndex = featureIndex;
+        this.featureIndex = aFeatureIndex;
     }
+
+    /**
+     * Constructor.
+     */
     public InputReading() {
         super(-1, -1);
         this.featureIndex = -1;
     }
 
-    public InputData getData() {
+    /**
+     * Get data.
+     *
+     * @return data
+     */
+    public final InputData getData() {
         return data;
     }
 
-    public void setData(InputData data) {
-        this.data = data;
+    /**
+     * Set data.
+     *
+     * @param aData data
+     */
+    public final void setData(final InputData aData) {
+        this.data = aData;
     }
 
-    public int getFeatureIndex() {
+    /**
+     * Get feature index.
+     *
+     * @return index
+     */
+    public final int getFeatureIndex() {
         return featureIndex;
     }
 
-    public void setFeatureIndex(int featureIndex) {
-        this.featureIndex = featureIndex;
+    /**
+     * Set feature index.
+     *
+     * @param aFeatureIndex index
+     */
+    public final void setFeatureIndex(final int aFeatureIndex) {
+        this.featureIndex = aFeatureIndex;
     }
 
+    /**
+     * Input data wrapper.
+     */
     @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
     @JsonSubTypes({
             @JsonSubTypes.Type(value = BatteryData.class, name = "Battery"),
@@ -48,30 +91,62 @@ public class InputReading extends ButtplugDeviceMessage {
     public static class InputData {
     }
 
-    static public class InputIntegerData extends InputData {
+    /**
+     * Input integer data.
+     */
+    public static class InputIntegerData extends InputData {
+        /**
+         * Value.
+         */
         @JsonProperty(value = "Value", required = true)
-        int value;
+        private int value;
 
-        public int getValue() {
+        /**
+         * Get value.
+         *
+         * @return value
+         */
+        public final int getValue() {
             return value;
         }
 
-        public void setValue(int value) {
-            this.value = value;
+        /**
+         * Set value.
+         *
+         * @param aValue value
+         */
+        public final void setValue(final int aValue) {
+            this.value = aValue;
         }
     }
 
-    static public class BatteryData extends InputIntegerData {
+    /**
+     * Battery data.
+     */
+    public static class BatteryData extends InputIntegerData {
     }
 
-    static public class RssiData extends InputIntegerData {
+    /**
+     * RSSI data.
+     */
+    public static class RssiData extends InputIntegerData {
     }
 
-    static public class ButtonData extends InputIntegerData {
+    /**
+     * Button data.
+     */
+    public static class ButtonData extends InputIntegerData {
     }
 
-    static public class PresureData extends InputIntegerData {
+    /**
+     * Pressure data.
+     */
+    public static class PresureData extends InputIntegerData {
     }
-    static public class Position extends InputIntegerData {
+
+    /**
+     * Position data.
+     */
+    public static class Position extends InputIntegerData {
     }
 }
